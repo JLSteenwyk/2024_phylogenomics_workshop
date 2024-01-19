@@ -1,0 +1,153 @@
+---
+title: 'Multiple sequence alignment trimming'
+author: "Jacob L Steenwyk"
+output: 
+  html_document:
+    code_folding: "hide"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy=TRUE, message = FALSE, warning = FALSE)
+
+colorize <- function(x, color) {
+  if (knitr::is_latex_output()) {
+    sprintf("\\textcolor{%s}{%s}", color, x)
+  } else if (knitr::is_html_output()) {
+    sprintf("<span style='color: %s;'>%s</span>", color,
+      x)
+  } else x
+}
+```
+Multiple sequence alignment trimming is a common step in phylogenomic workflows and aims to reduce errors/uninformative sites in alignments. Reducing total alignment size can save downstream computation time, but excessive trimming can be a source of error.
+
+Here, we will be trimming multiple sequence alignments using multiple strategies and examining the resulting alignment lengths.
+
+Note, steps within objectives that have fill-in-the-blank prompts are indicated as such using `r colorize("blue", "blue")` color font. Please fill in these prompts.
+Additionally, if the software you are trying to use isn’t in your path, it is likely in `~/software`.
+
+
+# Protocol {-}
+
+This objective is divided in three parts:
+
+* Download and examine the dataset 
+* Trim multiple sequence alignments using ClipKIT  
+* Trim multiple sequence alignments using BMGE 
+* Trim multiple sequence alignments using trimAl
+* Examine the resulting alignment lengths using PhyKIT
+
+The dataset for this practical will amino acid FASTA files.
+
+## 1. Download and examine the dataset 
+
+1.  With your Guacamole terminal download the data set, the URL is on the website [which website?]
+
+Hint:
+```{bash, eval=F}
+$ wget http://...
+```
+
+2. Confirm that you have downloaded the tar zipped directory `FILES_trimming_practical.tar.gz`
+3. Unzip the directory
+
+Hint:
+```{bash, eval=F}
+# the command is 'tar' ("tape archive")
+```
+
+solution:
+```{bash, eval=F}
+$ tar -zxvf FILES_trimming_practical.tar.gz
+```
+
+4. Change directory into the newly unzipped directory
+5. Examine the contents of the directory using the `ls` command
+6. `r colorize("How many files are in FILES_trimming_practical?", "blue")`
+
+## 2. Trim multiple sequence alignments using ClipKIT 
+ClipKIT is a tool for multiple sequence alignment trimming that aims to keep phylogenetically informative sites and discard others.
+[Publication](https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001007) and [online documentation](https://jlsteenwyk.com/ClipKIT).
+ 
+Steps:
+
+1. Examine the ClipKIT help message by executing the following: `clipkit -h`
+2. `r colorize("Briefly explain what smart-gap, kpic, and kpi trimming modes refer to.", "blue")` 
+3. Write separate for loops that trim using the smart-gap and kpic, and kpi approaches. Challenge: write a nested for loop that trims using both methods.
+ 
+Hint:
+```{bash, eval=F}
+The general structure of a for loop is:
+for i in $(<list of files>); do <action> ; done
+```
+
+Separate for loop solution:
+```{bash, eval=F}
+$ for i in $(ls *mafft); do clipkit $i -m smart-gap -o $i.clipkit_smart-gap; done
+$ for i in $(ls *mafft); do clipkit $i -m kpic -o $i.clipkit_kpic; done
+$ for i in $(ls *mafft); do clipkit $i -m kpi -o $i.clipkit_kpi; done
+```
+Nested for loop solution:
+```{bash, eval=F}
+$ for i in $(ls *mafft); do for j in $(echo "smart-gap kpic kpi"); do clipkit $i -m $j -o $i.clipkit_${j} ; done ; done
+```
+
+## 3. Trim multiple sequence alignments using BMGE 
+BMGE uses entropy to identify highly divergent sites in multiple sequence alignments and removes them.
+[Publication](https://bmcecolevol.biomedcentral.com/articles/10.1186/1471-2148-10-210) and [documentation](https://gensoft.pasteur.fr/docs/BMGE/1.12/BMGE_doc.pdf).
+
+Steps:
+
+1. Examine the help message by executing the following: `java -jar BMGE.jar -?`
+2. `r colorize("Which parameter specifies the entropy threshold?", "blue")` 
+3. Write separate for loops that trim using the an entropy threshold of 0.7 and 0.5. Challenge: write a nested for loop that trims using both methods.
+ 
+Separate for loop solution:
+```{bash, eval=F}
+$ for i in $(ls *mafft); do java -jar BMGE.jar -i $i -t AA -h 0.7 -o $i.BMGE0.7 ; done
+$ for i in $(ls *mafft); do java -jar BMGE.jar -i $i -t AA -h 0.5 -o $i.BMGE0.5 ; done
+```
+
+Nested for loop solution:
+```{bash, eval=F}
+$ for i in $(ls *mafft); do for j in $(echo "0.5 0.7"); do java -jar BMGE.jar -i $i -t AA -h $j -o $i.BMGE${j} ; done ; done
+```
+
+## 4. Trim multiple sequence alignments using trimAl  
+TrimAl removes highly divergent sites using a conservation threshold.
+[Publication](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2712344/) and [documentation](http://trimal.cgenomics.org/_media/tutorial.pdf).
+
+1. Examine the trimAl help message by executing the following: `trimal -h`
+2. `r colorize("How are the three trimming modes specified?", "blue")`
+3. Write separate for loops that trim using the gappyout and strictplus approaches. Challenge: write a nested for loop that trims using both methods
+
+Separate for loop solution:
+```{bash, eval=F}
+$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_$j -gappyout ; done
+$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_$j -strictplus ; done
+```
+
+Nested for loop solution:
+```{bash, eval=F}
+$ for i in $(ls *mafft); do for j in $(echo "gappyout strictplus"); do trimal -in $i -out $i.trimal_$j -${j} ; done ; done
+```
+
+## 5. Examine the resulting alignment lengths using PhyKIT
+PhyKIT is a command-line bioinformatics tool to facilitate processing and analysis of multiple sequence alignments and phylogenetic trees.
+[Publication](https://academic.oup.com/bioinformatics/article/37/16/2325/6131675) and [documentation](https://jlsteenwyk.com/PhyKIT).
+
+1. Navigate the PhyKIT online documentation.
+2. On the left navigation panel, click “Usage,” which will bring up four options: “General usage,” “Alignment-based functions,” “Tree-based functions,” Alignment- and tree-based functions.”
+3. Since we are calculating lengths of alignments, click “Alignment-based functions” and then “Alignment length”
+4. Write a for loop to calculate the alignment length of each trimmed alignment using PhyKIT
+
+Solution:
+```{bash, eval=F}
+$ for i in $(ls | grep -v "mafft$"); do echo -e -n "$i\t"; pk_aln_len $i ; done
+```
+
+5. `r colorize("For each ortholog, which trimming strategy removed the most sites and which removed the fewest?", "blue")`
+
+<br><br>
+<br><br>
+
+
