@@ -1,0 +1,309 @@
+---
+title: 'Concatenation and model testing'
+author: "The workshop team"
+date: "2024-01-23"
+output: 
+  html_document:
+    code_folding: "hide"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy=TRUE, message = FALSE, warning = FALSE)
+
+colorize <- function(x, color) {
+  if (knitr::is_latex_output()) {
+    sprintf("\\textcolor{%s}{%s}", color, x)
+  } else if (knitr::is_html_output()) {
+    sprintf("<span style='color: %s;'>%s</span>", color,
+      x)
+  } else x
+}
+```
+
+A concatenated supermatrix is used as input to infer a putative species phylogeny using the concatenation method. In this workshop practical, we will perform the common steps of creating a concatenated supermatrix, a partition file, and determining the appropriate models of evolution for partitions. 
+
+Note, steps within objectives that have fill-in-the-blank prompts are indicated as such using `r colorize("blue", "blue")` color font. Please fill in these prompts.
+Additionally, if the software you are trying to use isn’t in your path, it is likely in `~/software`.
+
+# Protocol {-}
+
+This objective is divided in three parts:
+
+* Download and examine the dataset 
+* Concatenate the amino acid FASTA files with PhyKIT 
+* Determine models of sequence evolution using IQ-TREE2
+* Phylogenomic subsampling based on information content of phylogenetic trees and alignments
+
+The dataset for this practical will be amino acid FASTA files.
+
+# 1. Download and examine the dataset 
+
+1. With your Guacamole terminal download the data set using the following URL: https://github.com/JLSteenwyk/2024_phylogenomics_workshop/blob/main/partitioning_and_concatenation_data/partitioning_and_concatenation_data.tar.gz
+
+Hint:
+```{bash, eval=F}
+$ wget http://...
+```
+2. Confirm that you have downloaded the tar zipped directory `trimming_data`
+3. Unzip the directory
+
+Hint:
+```{bash, eval=F}
+# the command is 'tar' ("tape archive")
+```
+
+Solution:
+```{bash, eval=F}
+$ tar -zxvf partitioning_and_concatenation_data.tar.gz
+```
+
+4. Change directory into the newly unzipped directory
+5. Examine the contents of the directory using the ls command
+6. `r colorize("How many directories are in FILES_concat_and_model_testing_practical?", "blue")`
+
+## 2. Concatenate the amino acid FASTA files with PhyKIT
+
+Inferring a putative species tree using the concatenation method requires constructing a supermatrix of all your genes. In this step, we will familiarize ourselves with the dataset and create a supermatrix using PhyKIT. 
+
+PhyKIT is a command-line bioinformatics tool to process and analyze multiple sequence alignments and phylogenetic trees.
+[Publication](https://academic.oup.com/bioinformatics/article/37/16/2325/6131675) and [documentation](https://jlsteenwyk.com/PhyKIT).
+
+Steps:
+1. Change directory to partitioning_and_concatenation_data [using the cd command]
+2. Examine the contents of the directory [using the ls command]
+3. `r colorize("How many FASTA files are there?", "blue")`
+
+Hint:
+```{r, eval=F}
+# they are aligned and trimmed using mafft and trimal and have “.fa.mafft.trimal” as suffixes
+```
+
+4. `r colorize("All FASTA files have the same set of taxa. How many taxa are in each FASTA file?", "blue")`
+
+Hint:
+```{r, eval=F}
+# use “grep” and “wc -l”
+```
+
+5. PhyKIT will be used for constructing the concatenated matrix. PhyKIT comes with a diverse suite of utilities. Examine all of the PhyKIT functions by examining the help message.
+
+Solution:
+```{bash, eval=F}
+phykit -h
+```
+
+For every PhyKIT function, there are aliases. For example, the treeness function can be executed using: `phykit treeness` or `pk_treeness`. The purposes of aliases is to allow “tabbing” through commands, saving some keystrokes.
+
+6. Now, use PhyKIT to create a concatenated supermatrix. First create a file with all the alignment names, then use that as a parameter to run PhyKIT. Give the output the prefix "concat".
+
+Solution:
+```{bash, eval=F}
+ls EOG092D* > alignments.txt
+pk_create_concat -a alignments.txt -pre concat
+```
+
+7. Three output files were created.
+* `r colorize("What does each file contain?", "blue")`
+* `r colorize("What is the length of the concatenated alignment?", "blue")`
+* `r colorize("The partition file is in RAxML-style format. What information does this format provide?", "blue")`
+
+8. Certain programs require nexus formatted partition files. To prepare you for creating nexus files, modify concat.partition to be in nexus format with the following command using an "in-house script":
+
+`bash partition2nexus.sh concat.partition > concat.partition.nex`
+
+9. Examine the contents of the resulting file
+
+## 3. Determine models of sequence evolution using IQ-TREE2
+
+Different genes may have different models of sequence evolution that best describes their evolution. As an example using models for nucleotide sequences, the simplest model is JC69 ( [Jukes and Cantor, 1969](https://www.sciencedirect.com/science/article/pii/B9781483232119500097?via%3Dihub) ) where assumptions of equal base frequencies and mutation rates is assumed for A, T, C, and G while the GTR ([generalized time-reversible](http://www.damtp.cam.ac.uk/user/st321/CV_&_Publications_files/STpapers-pdf/T86.pdf) ) model is the most general and may require up to six substitution rate parameters and four equilibrium base frequency parameters. As you may imagine, the evolution of some sequences may be best described by GTR as opposed to JC69 (or vice versa).
+
+There are numerous methods to determine the best fit models for sequences. In fact, many phylogenetic software (e.g., RAxML and IQ-tree) have this built into existing frameworks, which is why AUTO was specified in the model section for ‘auto selection’. However, one may want to determine the best-fit model separately for various reasons (e.g., to split up the task into smaller chunks).
+
+Here, we will use [IQTREE](https://www.ncbi.nlm.nih.gov/pubmed/28013191) to determine the best-fit model for our data as well as how many partitions are best.
+
+Objectives:
+1. Determine the number of partitions that can describe the data using a scheme similar to jModelTest/ProtTest within IQTREE using the following command:
+
+```{bash, eval=F}
+iqtree2 -s concat.fa -spp concat.partition.nex -m TESTMERGEONLY -pre concat_partition_jProt
+```
+
+2. Examine the resulting outputs to determine the following:
+* How many partitions were made?
+* What partitions were combined?
+* What models best fit each partition?
+* Which metric is used to evaluate model fit? BIC, AIC, or AICc
+  + Note, BIC, AIC, and AICc are Bayesian methods to evaluate model fit among a finite set of models. 
+
+Hint:
+```{r, eval=F}
+# answers to these questions can be found in concat_partition_testing.iqtree file
+```
+
+3. Determine the number of partitions that can describe the data using the ModelFinderPlus scheme within IQTREE using the following command:
+
+```{bash, eval=F}
+iqtree2 -s concat.fa -spp concat.partition.nex -m MF+MERGE -pre concat_partition_MFP
+```
+
+Note, this may take longer. Be patient and check on how your neighbor is doing.
+
+4. Examine the resulting outputs to determine the following:
+* `r colorize("How many partitions were made?", "blue")`
+* `r colorize("What partitions were combined?", "blue")`
+* `r colorize("What models best fit each partition?", "blue")`
+* `r colorize("How do these results using TESTMERGEONLY and MF+MERGE?", "blue")`
+
+5. Alternatively, a single best fitting substitution model can be determined by excluding the partition file and removing the `MERGE` from the model testing argument.
+For the sake of faster computation, test standard substitution models in the concatenated matrix.
+
+```{bash, eval=F}
+iqtree2 -s concat.fa -m TESTONLY -pre concat_partition_single_model
+```
+
+6. Examine the resulting outputs and address the following:
+* `r colorize("What was the best fitting substitution model?", "blue")`
+* `r colorize("Would the model that was selected be different if AIC was used instead of BIC to evaluate model fit?", "blue")`
+* `r colorize("Refer to IQ-TREE documentation to better understand what exactly is different.", "blue")` [IQTREE Substitution-Models Documentation](http://www.iqtree.org/doc/Substitution-Models)
+
+7. Rather than testing all possible substutiton models, researchers may want to test specific subsets.
+For example, suppose the best fitting substitution model for a given gene is `LG+F+G`. This site-homogeneous 
+model applies one reversible substitution matrix and the same character frequencies for all sites in a data
+matrix. Researchers may want to incorporate greater biological realism by allowing nucleotide or amino acid equilibrium frequencies to
+differ across sites. Models that incorporate this complexity into a maximum likelihood framework are termed profile mixture models.
+In doing so, profile mixture models help combat saturation by multiple substitutions, a well known source of 
+phylogenomic error.
+
+Test model fit across the site homogenous model `LG` and `LG` with varying amino acid equilibrium frequencies across sites using the following command:
+
+```{bash, eval=F}
+iqtree2 -s concat.fa -m TESTONLY -mset LG+G4,LG+C20,LG+C60 -pre concat_partition_concat_partition_site_heterogeneous
+```
+
+8. Examine the resulting outputs and address the following:
+* `r colorize("What was the best fitting substitution model?", "blue")`
+* `r colorize("What is the difference between C20 and C60?", "blue")` [IQTREE Substitution-Models Documentation](http://www.iqtree.org/doc/Substitution-Models)
+
+Solution:
+```{bash, eval=F}
+20 and 60 refer to the number of components in the mixture; in other words, complexity in site-heterogeneity. The more complex, the higher the value.
+Thus, C60 is more complex than C20. Available models range from C10 to C60 with a step of 10.
+```
+
+## 4. Phylogenomic subsampling based on information content of phylogenetic trees and alignments
+
+During phylogenomic subsampling, subsamples of loci in a full phylogenomic data matrix are used to re-infer organismal histories.
+This can help identify unstable bipartitions in phylogenetic trees (more to come about phylogenomic incongruence later).
+Subsampling is typically done by selecting, for example, half of the loci in a full data matrix with the desirable feature associated
+with phylogenetic signal.
+
+Here, we will conduct phylogenomic subsampling using the following metrics of information content:
+* [alignment length](https://jlsteenwyk.com/PhyKIT/usage/index.html#alignment-length)
+* [evolutionary rate](https://jlsteenwyk.com/PhyKIT/usage/index.html#evolutionary-rate)
+* [relative composition variability](https://jlsteenwyk.com/PhyKIT/usage/index.html#relative-composition-variability)
+* [long branch score](https://jlsteenwyk.com/PhyKIT/usage/index.html#long-branch-score)
+* [saturation](https://jlsteenwyk.com/PhyKIT/usage/index.html#saturation)
+* [treeness](https://jlsteenwyk.com/PhyKIT/usage/index.html#treeness)
+
+Because some metrics rely on information from single-locus phylogenies (e.g., long branch score),
+we first need to infer phylogenetic trees for each ortholog.
+
+1. To do so, we will use some short-cuts to speed up computation, such as using standard substitution model testing, not ModelFinder Plus.
+Execute the following `for` loop to infer single-locus phylogenetic trees.
+
+```{bash, eval=F}
+for i in $(ls EOG092D*); do iqtree2 -s $i -pre $i -m LG+F+G4 ; done
+```
+
+2. Calculate each metric of information content for individual orthologs using PhyKIT.
+To do so, execute the following command; note, while this command is running, move onto the
+the next two steps.
+
+```{bash, eval=F}
+for i in $(ls EOG092D*treefile | sed 's/.treefile//g'); do
+  echo -e -n "$i\talignment_length\t" ; pk_aln_len $i ;
+  echo -e -n "$i\tevo_rate\t" ; pk_evo_rate $i.treefile ;
+  echo -e -n "$i\trcv\t" ; pk_rcv $i ;
+  echo -e -n "$i\tlb_score\t" ; pk_lbs $i.treefile | grep "median" | awk '{print $NF}';
+  echo -e -n "$i\tsaturation\t" ; pk_saturation -a $i -t $i.treefile ;
+  echo -e -n "$i\ttreeness\t" ; pk_treeness $i.treefile ;
+done |tee gene_wise_information_content.txt
+```
+
+3. `r colorize("Refer to PhyKIT documentation and describe each of the differ metrics. What does each one refer to? For each metric are relatively higher or lower values better?", "blue")`
+Note, assume that you want genes with lower evolutionary rates; this is often preferred for datasets of anciently diverged organisms because genes with lower
+evolutionary rates are less likely to succumb to saturation by multiple substitutions.
+* [alignment length](https://jlsteenwyk.com/PhyKIT/usage/index.html#alignment-length)
+* [evolutionary rate](https://jlsteenwyk.com/PhyKIT/usage/index.html#evolutionary-rate)
+* [relative composition variability](https://jlsteenwyk.com/PhyKIT/usage/index.html#relative-composition-variability)
+* [long branch score](https://jlsteenwyk.com/PhyKIT/usage/index.html#long-branch-score)
+* [saturation](https://jlsteenwyk.com/PhyKIT/usage/index.html#saturation)
+* [treeness](https://jlsteenwyk.com/PhyKIT/usage/index.html#treeness)
+
+4. Suppose we want to subsamping using 60% of the total data matrix (3 / 5 genes). For each metric,
+which three genes should be concatenated together? Note, assume that you want genes with lower evolutionary rates.
+
+Solution:
+```{bash, eval=F}
+Alignment length: EOG092D1MLK.fa.mafft.trimal; EOG092D1QZM.fa.mafft.trimal; EOG092D1YWG.fa.mafft.trimal
+Evolutionary rate: EOG092D1MLK.fa.mafft.trimal; EOG092D1YWG.fa.mafft.trimal; EOG092D23QW.fa.mafft.trimal
+Relative composition variability: EOG092D1MLK.fa.mafft.trimal; EOG092D1YWG.fa.mafft.trimal; EOG092D23QW.fa.mafft.trimal
+Long branch score: EOG092D1QZM.fa.mafft.trimal; EOG092D23QW.fa.mafft.trimal; EOG092D2PES.fa.mafft.trimal
+Saturation: EOG092D1MLK.fa.mafft.trimal; EOG092D1QZM.fa.mafft.trimal; EOG092D23QW.fa.mafft.trimal
+Treeness: EOG092D1YWG.fa.mafft.trimal; EOG092D23QW.fa.mafft.trimal; EOG092D2PES.fa.mafft.trimal
+```
+
+5. Which metrics had the same best scoring sets of genes?
+
+Solution:
+```{bash, eval=F}
+Evolutionary rate & relative composition variability
+```
+
+6. Create concatenated matrices using the best scoring three genes, according to each metric. Create only one matrix for
+subsampling based on `evolutionary rate` and `relative composition variability`. To do so, execute the following commands:
+
+```{bash, eval=F}
+for i in $(echo "alignment_length evo_rate lb_score saturation treeness"); do
+  echo $i ;
+
+  if [ "$i" = "evo_rate" ] || [ "$i" = "lb_score" ]; then # if lower value is better
+    grep "$i" gene_wise_information_content.txt | sort -k3,3 -rn | tail -n 3 | awk '{print $1}' > aln_list_${i}.txt ; 
+  else
+    grep "$i" gene_wise_information_content.txt | sort -k3,3 -rn | head -n 3 | awk '{print $1}' > aln_list_${i}.txt ;
+  fi
+
+  pk_create_concat -a aln_list_${i}.txt -p concat_${i} ; 
+done
+```
+
+7. Infer quick and dirty phylogenies from each concatenated matrix using IQTREE. To speed up computation,
+we will use a predefined substitution matrix, `LG+F+G4`, and the `-fast` parameter, which reduces the
+expansiveness of tree search.
+
+```{bash, eval=F}
+for i in $(ls concat*fa); do
+  iqtree2 -s $i -pre $i -m LG+F+G4 -fast
+done
+```
+
+8) Compare the phylogenies inferred using subsampled data matrices to the phylogenetic tree inferred using the full data matrix.
+`r colorize("Which subsampling strategies resulted in a different phylogenetic tree?", "blue")`
+
+```{bash, eval=F}
+# Note, this may slightly differ depending on stochastic variation between runs.
+ls concat_*treefile | grep -v "partition" | while read i ; do pk_rf_dist concat.fa.treefile $i ; done
+```
+
+9) In many instances, each subsampling strategy resulted in a different phylogenetic tree. What does this suggest?
+
+Solution:
+```{bash, eval=F}
+This may suggest numerous things including:
+* five genes are insufficient to infer species trees (this is often, almost always, true)
+* there is a lot of noise among single genes (this is typically true too)
+* evolutionary relationships may be difficult to infer for many other reasons including insufficient taxon sampling, a history of raditions, etc.
+```
+
+### Stay tuned for the 2nd week of the workshop where will do a deep dive on more methods to detect and ameliorate incongruence during phylogenomic inference!
+
