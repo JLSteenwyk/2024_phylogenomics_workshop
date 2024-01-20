@@ -77,6 +77,15 @@ Steps:
 
 1. Examine the ClipKIT help message by executing the following: `clipkit -h`
 2. `r colorize("Briefly explain what smart-gap, kpic, and kpi trimming modes refer to.", "blue")` 
+
+Solution:
+```{bash, eval=F}
+Different trimming modes.
+
+smart-gap: dynamic determination of gaps threshold
+kpic: keeps parismony informative and constant sites
+kpi: keep only parsimony informative sites)
+```
 3. Write separate for loops that trim using the smart-gap and kpic, and kpi approaches. Challenge: write a nested for loop that trims using both methods.
  
 Hint:
@@ -107,6 +116,12 @@ Steps:
 
 1. Examine the help message by executing the following: `BMGE -?`
 2. `r colorize("Which parameter specifies the entropy threshold?", "blue")` 
+
+Separate for loop solution:
+```{bash, eval=F}
+-h <thr_max> : real number corresponding to the maximum entropy threshold (ranges from 0 to 1; default: 0.5)
+```
+
 3. Write separate for loops that trim using the an entropy threshold of 0.7 and 0.5. Challenge: write a nested for loop that trims using both methods.
  
 Separate for loop solution:
@@ -128,6 +143,12 @@ TrimAl removes highly divergent sites using a conservation threshold.
 
 1. Examine the trimAl help message by executing the following: `trimal -h`
 2. `r colorize("How are the three trimming modes specified?", "blue")`
+
+Solution:
+```{bash, eval=F}
+-gappyout, -strict , & -strictplus
+```
+
 3. Write separate for loops that trim using the gappyout and strictplus approaches. Challenge: write a nested for loop that trims using both methods
 
 Separate for loop solution:
