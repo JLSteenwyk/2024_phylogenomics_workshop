@@ -27,10 +27,15 @@ Programs used: MAFFT, ClipKIT, IQTREE2, PhyKIT, & OrthoSNAP
 Datasets of organisms with complex evolutionary histories, especially complex patterns of duplications and loss, can have few single-copy orthologs. As a result, it may be helpful to use newer strategies to obtain single-copy orthologs that are nested in larger, multi-copy orthogroups (OGs). To do so, we will implement a splitting and pruning procedure in OrthoSNAP. This software breaks or “snaps” branches in multi-copy gene families to identify single-copy OGs nested within; thus, single-copy OGs identified by OrthoSNAP are termed SNAP-OGs.
 
 This figure describes how OrthoSNAP works and what it takes as input.
+
+<br>
+
 ```{r, echo=FALSE, fig.cap="(A) OrthoSNAP takes as input two files: a FASTA file of a gene family with multiple homologs observed in 1 or more species and the associated gene family tree. The outputted file(s) will be individual FASTA files of SNAP-OGs. Depending on user arguments, individual Newick tree files can also be outputted. (B) A cartoon phylogenetic tree that depicts the evolutionary history of a gene family and 5 SNAP-OGs therein. While identifying SNAP-OGs, OrthoSNAP also identifies and prunes species-specific inparalogs (e.g., species2|gene2-copy_0 and species2|gene2-copy_1), retaining only the inparalog with the longest sequence, a practice common in transcriptomics. Note, OrthoSNAP requires that sequence naming schemes must be the same in both sequences and follow the convention in which a species, strain, or organism identifier and gene identifier are separated by pipe (or vertical bar; “|”) character.", out.width="100%"}
 
-knitr::include_graphics("figures/orthoSNAP.png")
+knitr::include_graphics("/Users/jacoblsteenwyk/Desktop/2024_phylogenomics_workshop/gene_trees_challenge/gene_tree_challenge_data/figures/orthoSNAP.png")
 ```
+
+<br>
 
 # Protocol {-}
 
@@ -38,17 +43,21 @@ Here,the objective will be learning how to use OrthoSNAP to identify SNAP-OGs. O
 
 This objective is divided in five parts:
 
- - [Download and examine the dataset]{1}
- - Align and trim the sequences
- - Infer single gene trees for each group of orthologous genes
- - Running OrthoSNAP
- - Create a concatenated matrix of the resulting SNAP-OGs
+* Download and examine the dataset
+* Align and trim the sequences
+* Infer single gene trees for each group of orthologous genes
+* Running OrthoSNAP
+* Create a concatenated matrix of the resulting SNAP-OGs
+* Examining a larger dataset
+* Polytomy testing and calculating gene support frequencies.
  
+<br>
 
 ## 1. Download and examine the dataset
 
- - Confirm that you have downloaded the necessary tar zipped directory
- - Unzip the directory
+1. Confirm that you have downloaded the necessary tar zipped directory
+TODO: add link to zipped directory and add link to download full dataset too.
+2. Unzip the directory
 
 Hint:
 ```{r, eval=FALSE}
@@ -57,22 +66,20 @@ Hint:
 
 Solution(s):  
 ```{bash, eval=F}
-tar -zxvf FILES_gene_trees_challenge.tar.gz
+tar -zxvf data.tar.gz
 ```
 
- - Now change directory into the newly unzipped directory
+3. Now change directory into the newly unzipped directory
 
 Solution:  
 ```{bash, eval=F}
-cd FILES_gene_trees_challenge
+cd data
 ```
 
- - Examine the contents of the directory using the ls command
- 
- Questions for you:
-    - How many FASTA files are in FILES_gene_trees_challenge?
-    - What is the naming scheme used for each FASTA entry?
-    - How many of the FASTA files are single-copy orthologous groups? <--dunno?
+4. Examine the contents of the directory using the ls command and address the following questions:
+* `r colorize("How many FASTA files are in data?", "blue")`
+* `r colorize("What is the naming scheme used for each FASTA entry?", "blue")`
+* `r colorize("How many of the FASTA files are single-copy orthologous groups?", "blue")`
 
 Hint:
 ```{r, eval=FALSE}
@@ -81,20 +88,35 @@ Hint:
 
 Solution:  
 ```{bash, eval=F}
+# How many FASTA files are in data?
 $ ls or $ ll or $ ls -1 | grep -c ".fa"
 
+# What is the naming scheme used for each FASTA entry?
 $ grep ">" OG0010342.fa
 
-shows: Tachyglossus_aculeatus.outgroup|XP_038618634.1  ie species_name.clade|gene_ID 
+shows: Tachyglossus_aculeatus.outgroup|XP_038618634.1  (i.e., species_name.clade|gene_ID)
 
-$ grep -c ">" OG001* or $ grep ">" OG0010342.fa | wc -l or ...
+# How many of the FASTA files are single-copy orthologous groups?
+for i in $(ls *fa); do
+  echo $i ;
+  grep ">" $i | sed 's/|.*$//g' | sort | uniq -c ;
+done
+
+# here is a breakdown of the more complex portion of the command
+# grep ">" $i: get FASTA headers of file i
+# sed 's/|.*$//g': remove everything after the pipe character to the end of the line, stripping gene names from the header
+# sort | uniq -c: sort and count how many times each species is present in a FASTA file 
+
+# any file with species present more than two times is NOT a single-copy ortholog; thus, none of them are.
 ```
+
+<br>
 
 ## 2. Align and trim the sequences 
 
 Align and trim the sequences using whatever multiple sequence alignment and trimming algorithm you’d like. In this tutorial, we will be using MAFFT and ClipKIT
 
- - align each FASTA file using MAFFT with the auto parameter (Bonus: do it with a bash loop! Doubble bonus: fix the file names with string interpolation!)
+1. align each FASTA file using MAFFT with the auto parameter (Bonus: do it with a bash loop! Doubble bonus: fix the file names with string interpolation!)
 
 Hint:
 ```{bash, eval=F}
@@ -113,23 +135,35 @@ $ for i in $(ls OG00*.fa); do mafft --auto $i > $i.mafft ; done
 $ for i in *.fa; do muscle -align $i -output ${i/.fa/.aln.fa}; done
 ```
 
- - trim each resulting alignment using the default parameters of ClipKIT (bonus: use a bash loop again!)
+2. trim each resulting alignment using the default parameters of ClipKIT (bonus: use a bash loop again!)
 
 Solution:
 ```{bash, eval=F}
 $ for i in $(ls *mafft); do clipkit $i ; done
+
+# OR
+
 $ for i in *.mafft; do clipkit $i; done
 ```
 
+<br>
+
 ## 3. Infer single gene trees for each group of orthologous genes 
 
- - Write a for loop to infer a phylogeny from each trimmed alignment using IQTREE2. For simplicity and to expedite computation, set the -m argument to be JTT+F+G4 and use the -fast argument to quickly infer the phylogenetic tree.
- 
+1. Write a for loop to infer a phylogeny from each trimmed alignment using IQTREE2. For simplicity and to expedite computation, set the -m argument to be JTT+F+G4 and use the -fast argument to quickly infer the phylogenetic tree.
+
+Solution:
+```{bash, eval=F}
+$ for i in *clipkit; do iqtree2 -s $i -pre $i -m JTT+F+G4 -fast ; done
+```
+
+<br>
+
 ## 4. Running OrthoSNAP
 
 Now, let’s break branches!
 
- - Write a for loop to execute OrthoSNAP on each OG. Hint: OrthoSNAP requires two arguments—-f and -t, which point the software to where the tree and associated FASTA file are located.
+1. Write a for loop to execute OrthoSNAP on each OG. Hint: OrthoSNAP requires two arguments -f and -t, which point the software to where the tree and associated FASTA file are located.
 
 Hint:
 ```{bash, eval=F}
@@ -137,34 +171,211 @@ Hint:
 ```
 
 Solution:
-```{r}
-
+```{bash, eval=F}
+for i in OG001*clipkit; do orthosnap -t $i.treefile -f $i ; done
 ```
 
-Questions for you:
- - How many SNAP-OGs were identified?
- - What can these SNAP-OGs be used to do in downstream analyses?
+2. Address the following questions:
+* `r colorize("How many SNAP-OGs were identified?", "blue")`
+* `r colorize("What can these SNAP-OGs be used to do in downstream analyses?", "blue")`
+
+<br>
 
 ## 5. Create a concatenated matrix of the resulting SNAP-OGs
 
 Among other analyses, SNAP-OGs can be used to infer phylogenomic trees. To put into practice what we learned during the concatenation practical, we will now create a concatenation matrix using the SNAP-OGs.
 
- - strip the gene names from the OrthoSNAP outputted files (ie replace '|' __pipe__ and '.' __dot__[and * and $?]). 
+1. strip the gene names from the OrthoSNAP outputted files (i.e replace '|' __pipe__ and everything thereafter). 
 
 Hint:
 ```{bash, eval=F}
 # use sed 's///g'
 # use a loop
 ```
+
 Solution:
 ```{bash, eval=F}
-for i in $(ls *orthosnap*fa); do mv $i temp ; cat temp | sed 's/|.*$//g' > $i ; done
+for i in *orthosnap*fa; do mv $i temp ; cat temp | sed 's/|.*$//g' > $i ; done
+# mv $i temp: create a temporary file of i
+# cat temp | sed 's/|.*$//g' > $i: open the temporary file, strip everything after the pipe, and then rewrite to file name i
 ```
 
+2. Address the following prompts:
+* `r colorize("Create a concatenated matrix using the create_concat function in PhyKIT.", "blue")`
+* `r colorize("Examine the resulting output files. Using the occupancy file, which SNAP-OG had the highest and lowest taxon occupancy?", "blue")`
+* `r colorize("Using the partition file, how long is the concatenated alignment?", "blue")`
 
- - `r colorize("Create a concatenated matrix using the create_concat function in PhyKIT.", "blue")`
- - `r colorize("Examine the resulting output files. Using the occupancy file, which SNAP-OG had the highest and lowest taxon occupancy?", "blue")`
- - `r colorize("Using the partition file, how long is the concatenated alignment?", "blue")`
+Solution:
+```{bash, eval=F}
+# Create a concatenated matrix using the create_concat function in PhyKIT.
+ls *orthosnap*fa > alignment_list.txt
+pk_create_concat -a alignment_list.txt -p concat_orthosnap
 
+# Examine the resulting output files. Using the occupancy file, which SNAP-OG had the highest and lowest taxon occupancy?
+The occupancy file has six columns:
+col 1: alignment file name
+col 2: number of taxa present
+col 3: number of taxa missing
+col 4: fraction of taxa present
+col 5: names of taxa that are missing
+col 6: names of taxa that are present
 
+highest: OG0010342.fa.mafft.clipkit.orthosnap.1.fa
+lowest: OG0017677.fa.mafft.clipkit.orthosnap.0.fa
 
+# Using the partition file, how long is the concatenated alignment?
+There are 2,609 sites.
+```
+
+<br>
+
+## 6. Examining the full dataset
+
+Set up:
+1. Download "full_dataset_trees.tar.gz"
+2. Unzip the directory.
+3. Move 'hypothesis_1.tre', 'hypothesis_2.tre', and 'polytomy_test_groups_file.txt' in `full_dataset_trees` to the current directory.
+
+So far, these files represent a subset of a much larger dataset, encompassing Eutherian mammals and outgroup taxa.
+For a long time, the evolutionary relationships among Eutherian mammals was contentious. Specifically, the evolutionary relationships
+among Afrotheria, Xenarthra, and other Eutherian mammals was unknown. The two major competing hypotheses were that Afrotheria and Xenarthra
+are sister lineages and that Afrotheria diverged from all other Eutherian mammals. In newick form, these hypotheses
+would be represented as follows:
+
+* hypothesis 1, Afrotheria and Xenarthra as sister lineages: ((Afrotheria, Xenarthra), Other_Eutheria);
+* hypothesis 2, Other_Eutheria and Xenarthra as sister lineages: ((Other_Eutheria, Xenarthra), Afrotheria);
+
+Here, we will test support for each hypothesis.
+
+4. Examine how many SNAP-OGs there are compared to traditional single-copy orthologous genes (SC-OGs).
+
+Solution:
+```{bash, eval=F}
+ls full_dataset_trees | grep -v "orthosnap" | wc -l
+     257
+ls full_dataset_trees | grep "orthosnap" | wc -l
+    1475
+
+# there are more 1,218 (1475 - 257) more SNAP-OGs than SC-OGs
+```
+
+5. We will now calculate how many genes support each hypothesis. This exact metric is typically
+referred to as "gene support frequencies" but was later adapted to be called "gene concordance factor."
+We will revisit gene concordance factors later in the workshop; specifically, while talking about phylogenomic
+incongruence.
+
+6. Let's examine the phylogenetic trees with each alternative hypothesis. (The point here is just to show you how to 
+quickly visualize a tree in the command-line and to have a deeper understanding of the underlying data.)
+
+Solution:
+```{bash, eval=F}
+pk_print_tree hypothesis_1.tre 
+```
+
+Note, the higher taxonomic classification is after each genus and species name. For example, 
+`Elephantulus_edwardii.Afrotheria` refers to genus and species `Elephantulus_edwardii` from the `Afrotheria` clade.
+For simplicity, "other Eutheria" is simplified to "Eutheria" and outgroup taxa are simply labeled as "outgroup".
+
+Now, examine the alternative hypothesis:
+
+Solution:
+```{bash, eval=F}
+pk_print_tree hypothesis_2.tre 
+```
+
+<br>
+
+## 7. Polytomy testing and calculating gene support frequencies.
+
+1. Among SC-OGs, calculate conduct a polytomy test and examine how many genes support sister relationships
+for each possible rooted quartet; that is, the number of gene trees that support sister relationships between
+* Afrotheria and Xenarthra
+* Afrotheria and other Eutheria
+* Xenarthra and other Eutheria
+
+2. To do so, we will use PhyKIT's polytomy testing function, [pk_polytomy_test](https://jlsteenwyk.com/PhyKIT/usage/index.html#polytomy-testing).
+To use this function, we have to specify each of the groups. This file has been prepared for you; take a look at it with the following command:
+
+```{bash, eval=F}
+$ cat polytomy_test_groups_file.txt 
+Eutheria_relationships	Chrysochloris_asiatica.Afrotheria;Echinops_telfairi.Afrotheria;Elephantulus_edwardii.Afrotheria;Loxodonta_africana.Afrotheria;Orycteropus_afer_afer.Afrotheria;Trichechus_manatus_latirostris.Afrotheria	Choloepus_didactylus.Xenarthra;Dasypus_novemcinctus.Xenarthra	Camelus_dromedarius.Eutheria;Canis_lupus_dingo.Eutheria;Capra_hircus.Eutheria;Desmodus_rotundus.Eutheria;Heterocephalus_glaber.Eutheria;Homo_sapiens.Eutheria;Macaca_mulatta.Eutheria;Mus_musculus.Eutheria;Oryctolagus_cuniculus.Eutheria;Phocoena_sinus.Eutheria;Sus_scrofa.Eutheria;Zalophus_californianus.Eutheria	Aythya_fuligula.outgroup;Dermochelys_coriacea.outgroup;Falco_rusticolus.outgroup;Lacerta_agilis.outgroup;Malaclemys_terrapin_terrapin.outgroup;Mauremys_reevesii.outgroup;Tachyglossus_aculeatus.outgroup;Taeniopygia_guttata.outgroup
+```
+
+There are five columns in the polytomy_test_groups_file.txt file and one row. Each row specifies different tests to conduct; each column specifies the following:
+* col 1: A placeholder name for users to label each different polytomy test
+* col 2: group 0 (in this case, Afrotheria)
+* col 3: group 1 (in this case, Xenarthra)
+* col 4: group 2 (in this case, other Eutheria)
+* col 5: group 3 (taxa that are not the three focal groups of interest in a rootet quartet; in this case, outgroup taxa)
+
+3. Create a file with paths to each SC-OG tree file. 
+
+```{bash, eval=F}
+ls FILES_orthosnap_full/ | grep -v "orthosnap" | awk '{print "FILES_orthosnap_full/"$1}' > SC-OG_list.txt
+```
+
+4. Conduct the polytomy test using SC-OGs. Here, are only using SC-OGs because there are fewer and this step can take longer than others - be patient and check on your neighbor :D
+
+```{bash, eval=F}
+$ pk_ptt -t SC-OG_list.txt -g polytomy_test_groups_file.txt
+
+Gene Support Frequency Results
+==============================
+chi-squared: 29.4524
+p-value: 0.0
+total genes: 252
+0-1: 121
+0-2: 51
+1-2: 80
+```
+
+The output of this test is as follows:
+* chi-squared: chi-squared value from chi-squared polytomy test
+* p-value: p-value from chi-squared polytomy test
+* total genes: the total number of genes used for polytomy testing
+  + Note, this is fewer than how many SC-OGs because not all are informative for testing, such as those that have insufficient taxon representation for each clade
+* 0-1: the number of genes that support a sister relationship between group 0 and group 1
+* 0-2: the number of genes that support a sister relationship between group 0 and group 2
+* 1-2: the number of genes that support a sister relationship between group 1 and group 2
+* As a reminder:
+  + group 0: Afrotheria
+  + group 1: Xenarthra
+  + group 2: other Eutheria
+
+* hypothesis 1, Afrotheria and Xenarthra as sister lineages: ((Afrotheria, Xenarthra), Other_Eutheria);
+* hypothesis 2, Other_Eutheria and Xenarthra as sister lineages: ((Other_Eutheria, Xenarthra), Afrotheria);
+
+`r colorize("Which hypothesis is best supported among SC-OGs?", "blue")`
+
+5. Conduct the polytomy test using SNAP-OGs. (Note, this may take some time so feel free to just examine the results.)
+
+```{bash, eval=F}
+$ ls FILES_orthosnap_full/*orthosnap* > SNAP-OG_list.txt 
+$ pk_ptt -t SNAP-OG_list.txt -g polytomy_test_groups_file.txt 
+
+Gene Support Frequency Results
+==============================
+chi-squared: 104.6823
+p-value: 0.0
+total genes: 1363
+0-1: 582
+0-2: 283
+1-2: 498
+```
+
+`r colorize("Which hypothesis is best supported among SNAP-OGs?", "blue")`
+`r colorize("How similar are patterns of support among SNAP-OGs and SC-OGs?", "blue")`
+
+10. Taken together, in this dataset, what can you infer about the phylogenetic informativeness of SC-OGs compared to SNAP-OGs?
+
+Solution:
+```{bash, eval=F}
+SNAP-OGs and SC-OGs are similar in their phylogenetic informativeness, suggesting that both are equally useful in phylogenomic analyses.
+
+One benefit from SNAP-OGs compared to SC-OGs is that there can be substantially more SNAP-OGs than SC-OGs, which can be helpful for hypothesis testing, such as explored here.
+```
+
+<br>
+<br>
+<br>
+<br>
