@@ -12,4 +12,6 @@
 
 * [Data](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/blob/main/trimming/alignment_trimming_data.tar.gz)
 
+<br /><br />
+
 ### Partitioning and concatenation laboratory
