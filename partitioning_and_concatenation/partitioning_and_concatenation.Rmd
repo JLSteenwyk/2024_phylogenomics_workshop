@@ -20,7 +20,9 @@ colorize <- function(x, color) {
 }
 ```
 
-A concatenated supermatrix is used as input to infer a putative species phylogeny using the concatenation method. In this workshop practical, we will perform the common steps of creating a concatenated supermatrix, a partition file, and determining the appropriate models of evolution for partitions. 
+A concatenated supermatrix is used as input to infer a putative species phylogeny using the concatenation method.
+In this workshop practical, we will perform the common steps of creating a concatenated supermatrix, a partition
+file, and determining the appropriate models of evolution for partitions. 
 
 Note, steps within objectives that have fill-in-the-blank prompts are indicated as such using `r colorize("blue", "blue")` color font. Please fill in these prompts.
 Additionally, if the software you are trying to use isn’t in your path, it is likely in `~/software`.
@@ -42,7 +44,8 @@ The dataset for this practical will be amino acid FASTA files.
 
 # 1. Download and examine the dataset 
 
-1. With your Guacamole terminal download the data set using the following URL: https://github.com/JLSteenwyk/2024_phylogenomics_workshop/blob/main/partitioning_and_concatenation_data/partitioning_and_concatenation_data.tar.gz
+1. With your Guacamole terminal download the data set using the following URL:
+[https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/partitioning_and_concatenation/partitioning_and_concatenation_data.tar.gz](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/partitioning_and_concatenation/partitioning_and_concatenation_data.tar.gz).
 
 Hint:
 ```{bash, eval=F}
@@ -107,7 +110,7 @@ For every PhyKIT function, there are aliases. For example, the treeness function
 Solution:
 ```{bash, eval=F}
 ls EOG092D* > alignments.txt
-pk_create_concat -a alignments.txt -pre concat
+pk_create_concat -a alignments.txt -p concat
 ```
 
 7. Three output files were created.
@@ -115,7 +118,13 @@ pk_create_concat -a alignments.txt -pre concat
 * `r colorize("What is the length of the concatenated alignment?", "blue")`
 * `r colorize("The partition file is in RAxML-style format. What information does this format provide?", "blue")`
 
-8. Certain programs require nexus formatted partition files. To prepare you for creating nexus files, modify concat.partition to be in nexus format with the following command using an "in-house script":
+8. Certain programs require nexus formatted partition files. To prepare you for creating nexus files, modify concat.partition to be in nexus format with the following command using an "in-house script", which can be downloaded
+from GitHub using the following link: [https://raw.githubusercontent.com/JLSteenwyk/2024_phylogenomics_workshop/main/partitioning_and_concatenation/partition2nexus.sh](https://raw.githubusercontent.com/JLSteenwyk/2024_phylogenomics_workshop/main/partitioning_and_concatenation/partition2nexus.sh)
+
+And to use the file, we must first change permissions:
+```{bash, eval=F}
+chmod 777 partition2nexus.sh
+```
 
 ```{bash, eval=F}
 bash partition2nexus.sh concat.partition > concat.partition.nex
@@ -166,7 +175,7 @@ Note, this may take longer. Be patient and check on how your neighbor is doing.
 * `r colorize("How many partitions were made?", "blue")`
 * `r colorize("What partitions were combined?", "blue")`
 * `r colorize("What models best fit each partition?", "blue")`
-* `r colorize("How do these results using TESTMERGEONLY and MF+MERGE?", "blue")`
+* `r colorize("How do these results using TESTMERGEONLY and MF+MERGE differ?", "blue")`
 
 5. Alternatively, a single best fitting substitution model can be determined by excluding the partition file and removing the `MERGE` from the model testing argument.
 For the sake of faster computation, test standard substitution models in the concatenated matrix.
@@ -191,7 +200,7 @@ phylogenomic error.
 Test model fit across the site homogenous model `LG` and `LG` with varying amino acid equilibrium frequencies across sites using the following command:
 
 ```{bash, eval=F}
-iqtree2 -s concat.fa -m TESTONLY -mset LG+G4,LG+C20,LG+C60 -pre concat_partition_concat_partition_site_heterogeneous
+iqtree2 -s concat.fa -m TESTONLY -mset LG+G4,LG+C20,LG+C60 -pre concat_partition_site_heterogeneous
 ```
 
 8. Examine the resulting outputs and address the following:
@@ -312,6 +321,8 @@ done
 # Note, this may slightly differ depending on stochastic variation between runs.
 ls concat_*treefile | grep -v "partition" | while read i ; do pk_rf_dist concat.fa.treefile $i ; done
 ```
+
+*BONUS*: visualize these phylogenies using lessons learned in previous labs to identify what bipartitions differ.
 
 9. In many instances, each subsampling strategy resulted in a different phylogenetic tree. What does this suggest?
 

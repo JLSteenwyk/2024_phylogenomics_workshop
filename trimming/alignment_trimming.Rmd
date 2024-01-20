@@ -50,7 +50,7 @@ Hint:
 $ wget http://...
 ```
 
-2. Confirm that you have downloaded the tar zipped directory `FILES_trimming_practical.tar.gz`
+2. Confirm that you have downloaded the tar zipped directory `alignment_trimming_data.tar.gz`
 3. Unzip the directory
 
 Hint:
@@ -60,12 +60,12 @@ Hint:
 
 solution:
 ```{bash, eval=F}
-$ tar -zxvf FILES_trimming_practical.tar.gz
+$ tar -zxvf alignment_trimming_data.tar.gz
 ```
 
 4. Change directory into the newly unzipped directory
 5. Examine the contents of the directory using the `ls` command
-6. `r colorize("How many files are in FILES_trimming_practical?", "blue")`
+6. `r colorize("How many files are in alignment_trimming_data?", "blue")`
 
 <br>
 
@@ -105,19 +105,19 @@ BMGE uses entropy to identify highly divergent sites in multiple sequence alignm
 
 Steps:
 
-1. Examine the help message by executing the following: `java -jar BMGE.jar -?`
+1. Examine the help message by executing the following: `BMGE -?`
 2. `r colorize("Which parameter specifies the entropy threshold?", "blue")` 
 3. Write separate for loops that trim using the an entropy threshold of 0.7 and 0.5. Challenge: write a nested for loop that trims using both methods.
  
 Separate for loop solution:
 ```{bash, eval=F}
-$ for i in $(ls *mafft); do java -jar BMGE.jar -i $i -t AA -h 0.7 -o $i.BMGE0.7 ; done
-$ for i in $(ls *mafft); do java -jar BMGE.jar -i $i -t AA -h 0.5 -o $i.BMGE0.5 ; done
+$ for i in $(ls *mafft); do BMGE -i $i -t AA -h 0.7 -o $i.BMGE0.7 ; done
+$ for i in $(ls *mafft); do BMGE -i $i -t AA -h 0.5 -o $i.BMGE0.5 ; done
 ```
 
 Nested for loop solution:
 ```{bash, eval=F}
-$ for i in $(ls *mafft); do for j in $(echo "0.5 0.7"); do java -jar BMGE.jar -i $i -t AA -h $j -o $i.BMGE${j} ; done ; done
+$ for i in $(ls *mafft); do for j in $(echo "0.5 0.7"); do BMGE -i $i -t AA -h $j -o $i.BMGE${j} ; done ; done
 ```
 
 <br>
@@ -132,8 +132,8 @@ TrimAl removes highly divergent sites using a conservation threshold.
 
 Separate for loop solution:
 ```{bash, eval=F}
-$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_$j -gappyout ; done
-$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_$j -strictplus ; done
+$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_gappyout -gappyout ; done
+$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_strictplus -strictplus ; done
 ```
 
 Nested for loop solution:
@@ -150,7 +150,12 @@ PhyKIT is a command-line bioinformatics tool to facilitate processing and analys
 1. Navigate the PhyKIT online documentation.
 2. On the left navigation panel, click “Usage,” which will bring up four options: “General usage,” “Alignment-based functions,” “Tree-based functions,” Alignment- and tree-based functions.”
 3. Since we are calculating lengths of alignments, click “Alignment-based functions” and then “Alignment length”
-4. Write a for loop to calculate the alignment length of each trimmed alignment using PhyKIT
+4. Write a for loop to calculate the alignment length of each trimmed alignment using PhyKIT. 
+Note, PhyKIT can be called two ways:
+  + phykit <name of function> <options> or the alias
+  + pk_<name of function>.
+The primary is a long-hand version and the latter is a short hand version that allows you to "tab out" all PhyKIT commands.
+Throughout, we will use the latter. 
 
 Solution:
 ```{bash, eval=F}
@@ -199,6 +204,10 @@ For example, in the left panel, BMGE with an entropy threshold of 0.3 performed 
 2. Finished really early?
 Try making a plot and show a TA!
 
+solution:
+```{r, eval=F}
+> info_content<-read.table("<PATH TO RESULTS FILE>/alignment_information_content.txt")
+> 
 <br><br>
 <br><br>
 
