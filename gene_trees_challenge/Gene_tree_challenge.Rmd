@@ -1,0 +1,170 @@
+---
+title: 'Gene trees challenge'
+author: "The workshop team"
+date: "2024-01-23"
+output: 
+  html_document:
+    code_folding: "hide"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, tidy=TRUE, message = FALSE, warning = FALSE)
+
+colorize <- function(x, color) {
+  if (knitr::is_latex_output()) {
+    sprintf("\\textcolor{%s}{%s}", color, x)
+  } else if (knitr::is_html_output()) {
+    sprintf("<span style='color: %s;'>%s</span>", color,
+      x)
+  } else x
+}
+```
+
+Note, steps within objectives that have fill-in-the-blank prompts are indicated as such using blue color font. Please fill in these prompts. Additionally, if the software you are trying to use isn’t in your path, it is likely in `~/software`.
+
+Programs used: MAFFT, ClipKIT, IQTREE2, PhyKIT, & OrthoSNAP 
+
+Datasets of organisms with complex evolutionary histories, especially complex patterns of duplications and loss, can have few single-copy orthologs. As a result, it may be helpful to use newer strategies to obtain single-copy orthologs that are nested in larger, multi-copy orthogroups (OGs). To do so, we will implement a splitting and pruning procedure in OrthoSNAP. This software breaks or “snaps” branches in multi-copy gene families to identify single-copy OGs nested within; thus, single-copy OGs identified by OrthoSNAP are termed SNAP-OGs.
+
+This figure describes how OrthoSNAP works and what it takes as input.
+```{r, echo=FALSE, fig.cap="(A) OrthoSNAP takes as input two files: a FASTA file of a gene family with multiple homologs observed in 1 or more species and the associated gene family tree. The outputted file(s) will be individual FASTA files of SNAP-OGs. Depending on user arguments, individual Newick tree files can also be outputted. (B) A cartoon phylogenetic tree that depicts the evolutionary history of a gene family and 5 SNAP-OGs therein. While identifying SNAP-OGs, OrthoSNAP also identifies and prunes species-specific inparalogs (e.g., species2|gene2-copy_0 and species2|gene2-copy_1), retaining only the inparalog with the longest sequence, a practice common in transcriptomics. Note, OrthoSNAP requires that sequence naming schemes must be the same in both sequences and follow the convention in which a species, strain, or organism identifier and gene identifier are separated by pipe (or vertical bar; “|”) character.", out.width="100%"}
+
+knitr::include_graphics("figures/orthoSNAP.png")
+```
+
+# Protocol {-}
+
+Here,the objective will be learning how to use OrthoSNAP to identify SNAP-OGs. Other skills and tasks reinforced during this practical include multiple sequence alignment, trimming, and tree inference. The dataset for this is orthologous groups of genes in FASTA format.
+
+This objective is divided in five parts:
+
+ - [Download and examine the dataset]{1}
+ - Align and trim the sequences
+ - Infer single gene trees for each group of orthologous genes
+ - Running OrthoSNAP
+ - Create a concatenated matrix of the resulting SNAP-OGs
+ 
+
+## 1. Download and examine the dataset
+
+ - Confirm that you have downloaded the necessary tar zipped directory
+ - Unzip the directory
+
+Hint:
+```{r, eval=FALSE}
+# the command is 'tar'
+```
+
+Solution(s):  
+```{bash, eval=F}
+tar -zxvf FILES_gene_trees_challenge.tar.gz
+```
+
+ - Now change directory into the newly unzipped directory
+
+Solution:  
+```{bash, eval=F}
+cd FILES_gene_trees_challenge
+```
+
+ - Examine the contents of the directory using the ls command
+ 
+ Questions for you:
+    - How many FASTA files are in FILES_gene_trees_challenge?
+    - What is the naming scheme used for each FASTA entry?
+    - How many of the FASTA files are single-copy orthologous groups? <--dunno?
+
+Hint:
+```{r, eval=FALSE}
+# you can list the the content, grep for a pattern eg a fasta header 
+```
+
+Solution:  
+```{bash, eval=F}
+$ ls or $ ll or $ ls -1 | grep -c ".fa"
+
+$ grep ">" OG0010342.fa
+
+shows: Tachyglossus_aculeatus.outgroup|XP_038618634.1  ie species_name.clade|gene_ID 
+
+$ grep -c ">" OG001* or $ grep ">" OG0010342.fa | wc -l or ...
+```
+
+## 2. Align and trim the sequences 
+
+Align and trim the sequences using whatever multiple sequence alignment and trimming algorithm you’d like. In this tutorial, we will be using MAFFT and ClipKIT
+
+ - align each FASTA file using MAFFT with the auto parameter (Bonus: do it with a bash loop! Doubble bonus: fix the file names with string interpolation!)
+
+Hint:
+```{bash, eval=F}
+# to run mafft just type it's name
+```
+
+Solution:
+```{bash, eval=F}
+# individual
+$ mafft --auto OG0010342.fa > OG0010342.mafft
+
+# loop
+$ for i in $(ls OG00*.fa); do mafft --auto $i > $i.mafft ; done
+
+# string interpolation (replacing the *.fa with *.aln.fa)
+$ for i in *.fa; do muscle -align $i -output ${i/.fa/.aln.fa}; done
+```
+
+ - trim each resulting alignment using the default parameters of ClipKIT (bonus: use a bash loop again!)
+
+Solution:
+```{bash, eval=F}
+$ for i in $(ls *mafft); do clipkit $i ; done
+$ for i in *.mafft; do clipkit $i; done
+```
+
+## 3. Infer single gene trees for each group of orthologous genes 
+
+ - Write a for loop to infer a phylogeny from each trimmed alignment using IQTREE2. For simplicity and to expedite computation, set the -m argument to be JTT+F+G4 and use the -fast argument to quickly infer the phylogenetic tree.
+ 
+## 4. Running OrthoSNAP
+
+Now, let’s break branches!
+
+ - Write a for loop to execute OrthoSNAP on each OG. Hint: OrthoSNAP requires two arguments—-f and -t, which point the software to where the tree and associated FASTA file are located.
+
+Hint:
+```{bash, eval=F}
+# OrthoSNAP requires two arguments -f and -t, which point the software to where the tree and associated FASTA file are located.
+```
+
+Solution:
+```{r}
+
+```
+
+Questions for you:
+ - How many SNAP-OGs were identified?
+ - What can these SNAP-OGs be used to do in downstream analyses?
+
+## 5. Create a concatenated matrix of the resulting SNAP-OGs
+
+Among other analyses, SNAP-OGs can be used to infer phylogenomic trees. To put into practice what we learned during the concatenation practical, we will now create a concatenation matrix using the SNAP-OGs.
+
+ - strip the gene names from the OrthoSNAP outputted files (ie replace '|' __pipe__ and '.' __dot__[and * and $?]). 
+
+Hint:
+```{bash, eval=F}
+# use sed 's///g'
+# use a loop
+```
+Solution:
+```{bash, eval=F}
+for i in $(ls *orthosnap*fa); do mv $i temp ; cat temp | sed 's/|.*$//g' > $i ; done
+```
+
+
+ - `r colorize("Create a concatenated matrix using the create_concat function in PhyKIT.", "blue")`
+ - `r colorize("Examine the resulting output files. Using the occupancy file, which SNAP-OG had the highest and lowest taxon occupancy?", "blue")`
+ - `r colorize("Using the partition file, how long is the concatenated alignment?", "blue")`
+
+
+

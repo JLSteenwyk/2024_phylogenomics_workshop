@@ -25,6 +25,7 @@ Here, we will be trimming multiple sequence alignments using multiple strategies
 Note, steps within objectives that have fill-in-the-blank prompts are indicated as such using `r colorize("blue", "blue")` color font. Please fill in these prompts.
 Additionally, if the software you are trying to use isn’t in your path, it is likely in `~/software`.
 
+<br>
 
 # Protocol {-}
 
@@ -37,6 +38,8 @@ This objective is divided in three parts:
 * Examine the resulting alignment lengths using PhyKIT
 
 The dataset for this practical will amino acid FASTA files.
+
+<br>
 
 ## 1. Download and examine the dataset 
 
@@ -63,6 +66,8 @@ $ tar -zxvf FILES_trimming_practical.tar.gz
 4. Change directory into the newly unzipped directory
 5. Examine the contents of the directory using the `ls` command
 6. `r colorize("How many files are in FILES_trimming_practical?", "blue")`
+
+<br>
 
 ## 2. Trim multiple sequence alignments using ClipKIT 
 ClipKIT is a tool for multiple sequence alignment trimming that aims to keep phylogenetically informative sites and discard others.
@@ -91,6 +96,9 @@ Nested for loop solution:
 $ for i in $(ls *mafft); do for j in $(echo "smart-gap kpic kpi"); do clipkit $i -m $j -o $i.clipkit_${j} ; done ; done
 ```
 
+
+<br>
+
 ## 3. Trim multiple sequence alignments using BMGE 
 BMGE uses entropy to identify highly divergent sites in multiple sequence alignments and removes them.
 [Publication](https://bmcecolevol.biomedcentral.com/articles/10.1186/1471-2148-10-210) and [documentation](https://gensoft.pasteur.fr/docs/BMGE/1.12/BMGE_doc.pdf).
@@ -112,6 +120,8 @@ Nested for loop solution:
 $ for i in $(ls *mafft); do for j in $(echo "0.5 0.7"); do java -jar BMGE.jar -i $i -t AA -h $j -o $i.BMGE${j} ; done ; done
 ```
 
+<br>
+
 ## 4. Trim multiple sequence alignments using trimAl  
 TrimAl removes highly divergent sites using a conservation threshold.
 [Publication](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2712344/) and [documentation](http://trimal.cgenomics.org/_media/tutorial.pdf).
@@ -131,6 +141,8 @@ Nested for loop solution:
 $ for i in $(ls *mafft); do for j in $(echo "gappyout strictplus"); do trimal -in $i -out $i.trimal_$j -${j} ; done ; done
 ```
 
+<br>
+
 ## 5. Examine the resulting alignment lengths using PhyKIT
 PhyKIT is a command-line bioinformatics tool to facilitate processing and analysis of multiple sequence alignments and phylogenetic trees.
 [Publication](https://academic.oup.com/bioinformatics/article/37/16/2325/6131675) and [documentation](https://jlsteenwyk.com/PhyKIT).
@@ -142,10 +154,50 @@ PhyKIT is a command-line bioinformatics tool to facilitate processing and analys
 
 Solution:
 ```{bash, eval=F}
-$ for i in $(ls | grep -v "mafft$"); do echo -e -n "$i\t"; pk_aln_len $i ; done
+$ for i in $(ls OG00*); do echo -e -n "$i\t"; pk_aln_len $i ; done
 ```
 
 5. `r colorize("For each ortholog, which trimming strategy removed the most sites and which removed the fewest?", "blue")`
+
+6. Let's examine other ways these alignments may differ. We will use PhyKIT to calculate diverse metrics that summarize the information content of these alignments.
+Specifically, we will calculate the following:
+* [alignment length, no gaps](https://jlsteenwyk.com/PhyKIT/usage/index.html#alignment-length-no-gaps)
+* [pairwise identity](https://jlsteenwyk.com/PhyKIT/usage/index.html#pairwise-identity)
+* [parsimony informative sites](https://jlsteenwyk.com/PhyKIT/usage/index.html#parsimony-informative-sites)
+
+Execute these commands and while the analysis is running, read about each metric in the PhyKIT documentation.
+
+```{bash, eval=F}
+for i in $(ls OG00*); do
+  echo -e -n "$i\talignment_length_no_gaps\t" ; pk_aln_len_no_gaps $i | awk '{print $1}';
+  echo -e -n "$i\tpairwise_identity\t" ; pk_pairwise_id $i  | grep "mean" | awk '{print $NF}';
+  echo -e -n "$i\tparsimony_informative_sites\t" ; pk_parsimony_informative_sites $i | awk '{print $1}';
+done |tee alignment_information_content.txt
+```
+
+7. `r colorize("Examine the resulting output. For ortholog OG0010342, which trimming strategy had the longest alignment length with no gaps?", "blue")`
+
+Solution:
+```{bash, eval=F}
+ClipKIT with the smart-gap parameter and trimAl with the gappyout parameter
+```
+
+## 6. Finished early? Try this challenge :D
+
+1.  Run this thought experiment: How would you visualize the differences between each trimming strategy?
+
+solution:
+```{bash, eval=F}
+1. Conduct dimensional reduction analysis using principal component analysis (or PCA).
+See this example from the ClipKIT manuscript https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001007.
+In this figure, methods that are far away from others produced drastically different results.
+For example, in the left panel, BMGE with an entropy threshold of 0.3 performed very different from the other trimming approaches.
+
+2. Plot boxplots (or violin plots, histograms, etc.) with one panel for each metric.
+```
+
+2. Finished really early?
+Try making a plot and show a TA!
 
 <br><br>
 <br><br>

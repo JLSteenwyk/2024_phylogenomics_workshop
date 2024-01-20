@@ -454,6 +454,7 @@ indicated as such using <span style="color: blue;">blue</span> color
 font. Please fill in these prompts. Additionally, if the software you
 are trying to use isn’t in your path, it is likely in
 <code>~/software</code>.</p>
+<p><br></p>
 <div id="protocol" class="section level1 unnumbered">
 <h1 class="unnumbered">Protocol</h1>
 <p>This objective is divided in three parts:</p>
@@ -466,6 +467,7 @@ are trying to use isn’t in your path, it is likely in
 <li>Examine the resulting alignment lengths using PhyKIT</li>
 </ul>
 <p>The dataset for this practical will amino acid FASTA files.</p>
+<p><br></p>
 <div id="download-and-examine-the-dataset" class="section level2">
 <h2>1. Download and examine the dataset</h2>
 <ol style="list-style-type: decimal">
@@ -490,6 +492,7 @@ command</li>
 <li><span style="color: blue;">How many files are in
 FILES_trimming_practical?</span></li>
 </ol>
+<p><br></p>
 </div>
 <div id="trim-multiple-sequence-alignments-using-clipkit" class="section level2">
 <h2>2. Trim multiple sequence alignments using ClipKIT</h2>
@@ -516,6 +519,7 @@ $ for i in $(ls *mafft); do clipkit $i -m kpic -o $i.clipkit_kpic; done
 $ for i in $(ls *mafft); do clipkit $i -m kpi -o $i.clipkit_kpi; done</code></pre>
 <p>Nested for loop solution:</p>
 <pre class="bash"><code>$ for i in $(ls *mafft); do for j in $(echo &quot;smart-gap kpic kpi&quot;); do clipkit $i -m $j -o $i.clipkit_${j} ; done ; done</code></pre>
+<p><br></p>
 </div>
 <div id="trim-multiple-sequence-alignments-using-bmge" class="section level2">
 <h2>3. Trim multiple sequence alignments using BMGE</h2>
@@ -537,6 +541,7 @@ methods.</li>
 $ for i in $(ls *mafft); do java -jar BMGE.jar -i $i -t AA -h 0.5 -o $i.BMGE0.5 ; done</code></pre>
 <p>Nested for loop solution:</p>
 <pre class="bash"><code>$ for i in $(ls *mafft); do for j in $(echo &quot;0.5 0.7&quot;); do java -jar BMGE.jar -i $i -t AA -h $j -o $i.BMGE${j} ; done ; done</code></pre>
+<p><br></p>
 </div>
 <div id="trim-multiple-sequence-alignments-using-trimal" class="section level2">
 <h2>4. Trim multiple sequence alignments using trimAl</h2>
@@ -557,6 +562,7 @@ methods</li>
 $ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_$j -strictplus ; done</code></pre>
 <p>Nested for loop solution:</p>
 <pre class="bash"><code>$ for i in $(ls *mafft); do for j in $(echo &quot;gappyout strictplus&quot;); do trimal -in $i -out $i.trimal_$j -${j} ; done ; done</code></pre>
+<p><br></p>
 </div>
 <div id="examine-the-resulting-alignment-lengths-using-phykit" class="section level2">
 <h2>5. Examine the resulting alignment lengths using PhyKIT</h2>
@@ -574,11 +580,54 @@ functions,” Alignment- and tree-based functions.”</li>
 alignment using PhyKIT</li>
 </ol>
 <p>Solution:</p>
-<pre class="bash"><code>$ for i in $(ls | grep -v &quot;mafft$&quot;); do echo -e -n &quot;$i\t&quot;; pk_aln_len $i ; done</code></pre>
+<pre class="bash"><code>$ for i in $(ls OG00*); do echo -e -n &quot;$i\t&quot;; pk_aln_len $i ; done</code></pre>
 <ol start="5" style="list-style-type: decimal">
-<li><span style="color: blue;">For each ortholog, which trimming
+<li><p><span style="color: blue;">For each ortholog, which trimming
 strategy removed the most sites and which removed the
-fewest?</span></li>
+fewest?</span></p></li>
+<li><p>Let’s examine other ways these alignments may differ. We will use
+PhyKIT to calculate diverse metrics that summarize the information
+content of these alignments. Specifically, we will calculate the
+following:</p></li>
+</ol>
+<ul>
+<li><a href="https://jlsteenwyk.com/PhyKIT/usage/index.html#alignment-length-no-gaps">alignment
+length, no gaps</a></li>
+<li><a href="https://jlsteenwyk.com/PhyKIT/usage/index.html#pairwise-identity">pairwise
+identity</a></li>
+<li><a href="https://jlsteenwyk.com/PhyKIT/usage/index.html#parsimony-informative-sites">parsimony
+informative sites</a></li>
+</ul>
+<p>Execute these commands and while the analysis is running, read about
+each metric in the PhyKIT documentation.</p>
+<pre class="bash"><code>for i in $(ls OG00*); do
+  echo -e -n &quot;$i\talignment_length_no_gaps\t&quot; ; pk_aln_len_no_gaps $i | awk &#39;{print $1}&#39;;
+  echo -e -n &quot;$i\tpairwise_identity\t&quot; ; pk_pairwise_id $i  | grep &quot;mean&quot; | awk &#39;{print $NF}&#39;;
+  echo -e -n &quot;$i\tparsimony_informative_sites\t&quot; ; pk_parsimony_informative_sites $i | awk &#39;{print $1}&#39;;
+done |tee alignment_information_content.txt</code></pre>
+<ol start="7" style="list-style-type: decimal">
+<li><span style="color: blue;">Examine the resulting output. For
+ortholog OG0010342, which trimming strategy had the longest alignment
+length with no gaps?</span></li>
+</ol>
+<p>Solution:</p>
+<pre class="bash"><code>ClipKIT with the smart-gap parameter and trimAl with the gappyout parameter</code></pre>
+</div>
+<div id="finished-early-try-this-challenge-d" class="section level2">
+<h2>6. Finished early? Try this challenge :D</h2>
+<ol style="list-style-type: decimal">
+<li>Run this thought experiment: How would you visualize the differences
+between each trimming strategy?</li>
+</ol>
+<p>solution:</p>
+<pre class="bash"><code>1. Conduct dimensional reduction analysis using principal component analysis (or PCA).
+See this example from the ClipKIT manuscript https://journals.plos.org/plosbiology/article?id=10.1371/journal.pbio.3001007.
+In this figure, methods that are far away from others produced drastically different results.
+For example, in the left panel, BMGE with an entropy threshold of 0.3 performed very different from the other trimming approaches.
+
+2. Plot boxplots (or violin plots, histograms, etc.) with one panel for each metric.</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Finished really early? Try making a plot and show a TA!</li>
 </ol>
 <p><br><br> <br><br></p>
 </div>
