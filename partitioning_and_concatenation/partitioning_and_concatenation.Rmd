@@ -25,6 +25,8 @@ A concatenated supermatrix is used as input to infer a putative species phylogen
 Note, steps within objectives that have fill-in-the-blank prompts are indicated as such using `r colorize("blue", "blue")` color font. Please fill in these prompts.
 Additionally, if the software you are trying to use isn’t in your path, it is likely in `~/software`.
 
+<br>
+
 # Protocol {-}
 
 This objective is divided in three parts:
@@ -35,6 +37,8 @@ This objective is divided in three parts:
 * Phylogenomic subsampling based on information content of phylogenetic trees and alignments
 
 The dataset for this practical will be amino acid FASTA files.
+
+<br><br>
 
 # 1. Download and examine the dataset 
 
@@ -61,12 +65,16 @@ $ tar -zxvf partitioning_and_concatenation_data.tar.gz
 5. Examine the contents of the directory using the ls command
 6. `r colorize("How many directories are in FILES_concat_and_model_testing_practical?", "blue")`
 
+<br><br>
+
 ## 2. Concatenate the amino acid FASTA files with PhyKIT
 
 Inferring a putative species tree using the concatenation method requires constructing a supermatrix of all your genes. In this step, we will familiarize ourselves with the dataset and create a supermatrix using PhyKIT. 
 
 PhyKIT is a command-line bioinformatics tool to process and analyze multiple sequence alignments and phylogenetic trees.
 [Publication](https://academic.oup.com/bioinformatics/article/37/16/2325/6131675) and [documentation](https://jlsteenwyk.com/PhyKIT).
+
+<br>
 
 Steps:
 1. Change directory to partitioning_and_concatenation_data [using the cd command]
@@ -103,26 +111,32 @@ pk_create_concat -a alignments.txt -pre concat
 ```
 
 7. Three output files were created.
-* `r colorize("What does each file contain?", "blue")`
+* `r colorize("What does each file contain?", "blue")` Hint: [PhyKIT](https://jlsteenwyk.com/PhyKIT/usage/index.html#create-concatenation-matrix) documentation provides this information. 
 * `r colorize("What is the length of the concatenated alignment?", "blue")`
 * `r colorize("The partition file is in RAxML-style format. What information does this format provide?", "blue")`
 
 8. Certain programs require nexus formatted partition files. To prepare you for creating nexus files, modify concat.partition to be in nexus format with the following command using an "in-house script":
 
-`bash partition2nexus.sh concat.partition > concat.partition.nex`
+```{bash, eval=F}
+bash partition2nexus.sh concat.partition > concat.partition.nex
+```
 
 9. Examine the contents of the resulting file
 
+<br><br>
+
 ## 3. Determine models of sequence evolution using IQ-TREE2
 
-Different genes may have different models of sequence evolution that best describes their evolution. As an example using models for nucleotide sequences, the simplest model is JC69 ( [Jukes and Cantor, 1969](https://www.sciencedirect.com/science/article/pii/B9781483232119500097?via%3Dihub) ) where assumptions of equal base frequencies and mutation rates is assumed for A, T, C, and G while the GTR ([generalized time-reversible](http://www.damtp.cam.ac.uk/user/st321/CV_&_Publications_files/STpapers-pdf/T86.pdf) ) model is the most general and may require up to six substitution rate parameters and four equilibrium base frequency parameters. As you may imagine, the evolution of some sequences may be best described by GTR as opposed to JC69 (or vice versa).
+Different genes may have different models of sequence evolution that best describes their evolution. As an example using models for nucleotide sequences, the simplest model is JC69 ([Jukes and Cantor, 1969](https://www.sciencedirect.com/science/article/pii/B9781483232119500097?via%3Dihub)) where assumptions of equal base frequencies and mutation rates is assumed for A, T, C, and G while the GTR ([generalized time-reversible](http://www.damtp.cam.ac.uk/user/st321/CV_&_Publications_files/STpapers-pdf/T86.pdf) ) model is the most general and may require up to six substitution rate parameters and four equilibrium base frequency parameters. As you may imagine, the evolution of some sequences may be best described by GTR as opposed to JC69 (or vice versa).
 
 There are numerous methods to determine the best fit models for sequences. In fact, many phylogenetic software (e.g., RAxML and IQ-tree) have this built into existing frameworks, which is why AUTO was specified in the model section for ‘auto selection’. However, one may want to determine the best-fit model separately for various reasons (e.g., to split up the task into smaller chunks).
 
 Here, we will use [IQTREE](https://www.ncbi.nlm.nih.gov/pubmed/28013191) to determine the best-fit model for our data as well as how many partitions are best.
 
-Objectives:
-1. Determine the number of partitions that can describe the data using a scheme similar to jModelTest/ProtTest within IQTREE using the following command:
+<br>
+
+Steps:
+1. Determine the number of partitions that can describe the data using a scheme similar to [jModelTest/ProtTest](https://academic.oup.com/mbe/article/25/7/1253/1045159) within IQTREE using the following command:
 
 ```{bash, eval=F}
 iqtree2 -s concat.fa -spp concat.partition.nex -m TESTMERGEONLY -pre concat_partition_jProt
@@ -190,6 +204,8 @@ Solution:
 Thus, C60 is more complex than C20. Available models range from C10 to C60 with a step of 10.
 ```
 
+<br>
+
 ## 4. Phylogenomic subsampling based on information content of phylogenetic trees and alignments
 
 During phylogenomic subsampling, subsamples of loci in a full phylogenomic data matrix are used to re-infer organismal histories.
@@ -229,6 +245,8 @@ for i in $(ls EOG092D*treefile | sed 's/.treefile//g'); do
   echo -e -n "$i\ttreeness\t" ; pk_treeness $i.treefile ;
 done |tee gene_wise_information_content.txt
 ```
+
+`r colorize("What do the -e and -n arguments of echo do?", "blue")`
 
 3. `r colorize("Refer to PhyKIT documentation and describe each of the differ metrics. What does each one refer to? For each metric are relatively higher or lower values better?", "blue")`
 Note, assume that you want genes with lower evolutionary rates; this is often preferred for datasets of anciently diverged organisms because genes with lower
@@ -287,7 +305,7 @@ for i in $(ls concat*fa); do
 done
 ```
 
-8) Compare the phylogenies inferred using subsampled data matrices to the phylogenetic tree inferred using the full data matrix.
+8. Compare the phylogenies inferred using subsampled data matrices to the phylogenetic tree inferred using the full data matrix.
 `r colorize("Which subsampling strategies resulted in a different phylogenetic tree?", "blue")`
 
 ```{bash, eval=F}
@@ -295,15 +313,17 @@ done
 ls concat_*treefile | grep -v "partition" | while read i ; do pk_rf_dist concat.fa.treefile $i ; done
 ```
 
-9) In many instances, each subsampling strategy resulted in a different phylogenetic tree. What does this suggest?
+9. In many instances, each subsampling strategy resulted in a different phylogenetic tree. What does this suggest?
 
 Solution:
 ```{bash, eval=F}
 This may suggest numerous things including:
 * five genes are insufficient to infer species trees (this is often, almost always, true)
-* there is a lot of noise among single genes (this is typically true too)
+* there is a lot of noise among single genes (this is often true too)
 * evolutionary relationships may be difficult to infer for many other reasons including insufficient taxon sampling, a history of raditions, etc.
 ```
 
-### Stay tuned for the 2nd week of the workshop where will do a deep dive on more methods to detect and ameliorate incongruence during phylogenomic inference!
+This practice of phylogenomic subsampling underscores how incongruence can be rampant among small sets of genes.
+Stay tuned for the 2nd week of the workshop where will do a deep dive on more methods to detect and ameliorate incongruence during phylogenomic inference!
 
+<br><br>

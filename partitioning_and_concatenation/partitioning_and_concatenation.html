@@ -455,6 +455,7 @@ indicated as such using <span style="color: blue;">blue</span> color
 font. Please fill in these prompts. Additionally, if the software you
 are trying to use isn’t in your path, it is likely in
 <code>~/software</code>.</p>
+<p><br></p>
 <div id="protocol" class="section level1 unnumbered">
 <h1 class="unnumbered">Protocol</h1>
 <p>This objective is divided in three parts:</p>
@@ -466,6 +467,7 @@ are trying to use isn’t in your path, it is likely in
 phylogenetic trees and alignments</li>
 </ul>
 <p>The dataset for this practical will be amino acid FASTA files.</p>
+<p><br><br></p>
 </div>
 <div id="download-and-examine-the-dataset" class="section level1">
 <h1>1. Download and examine the dataset</h1>
@@ -490,6 +492,7 @@ following URL: <a href="https://github.com/JLSteenwyk/2024_phylogenomics_worksho
 <li><span style="color: blue;">How many directories are in
 FILES_concat_and_model_testing_practical?</span></li>
 </ol>
+<p><br><br></p>
 <div id="concatenate-the-amino-acid-fasta-files-with-phykit" class="section level2">
 <h2>2. Concatenate the amino acid FASTA files with PhyKIT</h2>
 <p>Inferring a putative species tree using the concatenation method
@@ -499,6 +502,7 @@ using PhyKIT.</p>
 <p>PhyKIT is a command-line bioinformatics tool to process and analyze
 multiple sequence alignments and phylogenetic trees. <a href="https://academic.oup.com/bioinformatics/article/37/16/2325/6131675">Publication</a>
 and <a href="https://jlsteenwyk.com/PhyKIT">documentation</a>.</p>
+<p><br></p>
 <p>Steps: 1. Change directory to partitioning_and_concatenation_data
 [using the cd command] 2. Examine the contents of the directory [using
 the ls command] 3. <span style="color: blue;">How many FASTA files are
@@ -535,7 +539,9 @@ pk_create_concat -a alignments.txt -pre concat</code></pre>
 <li>Three output files were created.</li>
 </ol>
 <ul>
-<li><span style="color: blue;">What does each file contain?</span></li>
+<li><span style="color: blue;">What does each file contain?</span> Hint:
+<a href="https://jlsteenwyk.com/PhyKIT/usage/index.html#create-concatenation-matrix">PhyKIT</a>
+documentation provides this information.</li>
 <li><span style="color: blue;">What is the length of the concatenated
 alignment?</span></li>
 <li><span style="color: blue;">The partition file is in RAxML-style
@@ -546,17 +552,18 @@ format. What information does this format provide?</span></li>
 you for creating nexus files, modify concat.partition to be in nexus
 format with the following command using an “in-house script”:</li>
 </ol>
-<p><code>bash partition2nexus.sh concat.partition &gt; concat.partition.nex</code></p>
+<pre class="bash"><code>bash partition2nexus.sh concat.partition &gt; concat.partition.nex</code></pre>
 <ol start="9" style="list-style-type: decimal">
 <li>Examine the contents of the resulting file</li>
 </ol>
+<p><br><br></p>
 </div>
 <div id="determine-models-of-sequence-evolution-using-iq-tree2" class="section level2">
 <h2>3. Determine models of sequence evolution using IQ-TREE2</h2>
 <p>Different genes may have different models of sequence evolution that
 best describes their evolution. As an example using models for
-nucleotide sequences, the simplest model is JC69 ( <a href="https://www.sciencedirect.com/science/article/pii/B9781483232119500097?via%3Dihub">Jukes
-and Cantor, 1969</a> ) where assumptions of equal base frequencies and
+nucleotide sequences, the simplest model is JC69 (<a href="https://www.sciencedirect.com/science/article/pii/B9781483232119500097?via%3Dihub">Jukes
+and Cantor, 1969</a>) where assumptions of equal base frequencies and
 mutation rates is assumed for A, T, C, and G while the GTR (<a href="http://www.damtp.cam.ac.uk/user/st321/CV_&amp;_Publications_files/STpapers-pdf/T86.pdf">generalized
 time-reversible</a> ) model is the most general and may require up to
 six substitution rate parameters and four equilibrium base frequency
@@ -571,9 +578,10 @@ want to determine the best-fit model separately for various reasons
 <p>Here, we will use <a href="https://www.ncbi.nlm.nih.gov/pubmed/28013191">IQTREE</a> to
 determine the best-fit model for our data as well as how many partitions
 are best.</p>
-<p>Objectives: 1. Determine the number of partitions that can describe
-the data using a scheme similar to jModelTest/ProtTest within IQTREE
-using the following command:</p>
+<p><br></p>
+<p>Steps: 1. Determine the number of partitions that can describe the
+data using a scheme similar to <a href="https://academic.oup.com/mbe/article/25/7/1253/1045159">jModelTest/ProtTest</a>
+within IQTREE using the following command:</p>
 <pre class="bash"><code>iqtree2 -s concat.fa -spp concat.partition.nex -m TESTMERGEONLY -pre concat_partition_jProt</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Examine the resulting outputs to determine the following:</li>
@@ -663,6 +671,7 @@ Substitution-Models Documentation</a></li>
 <p>Solution:</p>
 <pre class="bash"><code>20 and 60 refer to the number of components in the mixture; in other words, complexity in site-heterogeneity. The more complex, the higher the value.
 Thus, C60 is more complex than C20. Available models range from C10 to C60 with a step of 10.</code></pre>
+<p><br></p>
 </div>
 <div id="phylogenomic-subsampling-based-on-information-content-of-phylogenetic-trees-and-alignments" class="section level2">
 <h2>4. Phylogenomic subsampling based on information content of
@@ -703,6 +712,8 @@ while this command is running, move onto the the next two steps.</li>
   echo -e -n &quot;$i\tsaturation\t&quot; ; pk_saturation -a $i -t $i.treefile ;
   echo -e -n &quot;$i\ttreeness\t&quot; ; pk_treeness $i.treefile ;
 done |tee gene_wise_information_content.txt</code></pre>
+<p><span style="color: blue;">What do the -e and -n arguments of echo
+do?</span></p>
 <ol start="3" style="list-style-type: decimal">
 <li><span style="color: blue;">Refer to PhyKIT documentation and
 describe each of the differ metrics. What does each one refer to? For
@@ -783,13 +794,13 @@ phylogenetic tree. What does this suggest?</li>
 <p>Solution:</p>
 <pre class="bash"><code>This may suggest numerous things including:
 * five genes are insufficient to infer species trees (this is often, almost always, true)
-* there is a lot of noise among single genes (this is typically true too)
+* there is a lot of noise among single genes (this is often true too)
 * evolutionary relationships may be difficult to infer for many other reasons including insufficient taxon sampling, a history of raditions, etc.</code></pre>
-<div id="stay-tuned-for-the-2nd-week-of-the-workshop-where-will-do-a-deep-dive-on-more-methods-to-detect-and-ameliorate-incongruence-during-phylogenomic-inference" class="section level3">
-<h3>Stay tuned for the 2nd week of the workshop where will do a deep
-dive on more methods to detect and ameliorate incongruence during
-phylogenomic inference!</h3>
-</div>
+<p>This practice of phylogenomic subsampling underscores how
+incongruence can be rampant among small sets of genes. Stay tuned for
+the 2nd week of the workshop where will do a deep dive on more methods
+to detect and ameliorate incongruence during phylogenomic inference!</p>
+<p><br><br></p>
 </div>
 </div>
 
