@@ -31,7 +31,7 @@ Additionally, if the software you are trying to use isn’t in your path, it is 
 
 # Protocol {-}
 
-This objective is divided in three parts:
+This objective is divided in five parts:
 
 * Download and examine the dataset 
 * Trim multiple sequence alignments using ClipKIT  
@@ -100,13 +100,13 @@ for i in $(<list of files>); do <action> ; done
 
 Separate for loop solution:
 ```{bash, eval=F}
-$ for i in $(ls *mafft); do clipkit $i -m smart-gap -o $i.clipkit_smart-gap; done
-$ for i in $(ls *mafft); do clipkit $i -m kpic -o $i.clipkit_kpic; done
-$ for i in $(ls *mafft); do clipkit $i -m kpi -o $i.clipkit_kpi; done
+$ for i in *mafft; do clipkit $i -m smart-gap -o $i.clipkit_smart-gap; done
+$ for i in *mafft; do clipkit $i -m kpic -o $i.clipkit_kpic; done
+$ for i in *mafft; do clipkit $i -m kpi -o $i.clipkit_kpi; done
 ```
 Nested for loop solution:
 ```{bash, eval=F}
-$ for i in $(ls *mafft); do for j in $(echo "smart-gap kpic kpi"); do clipkit $i -m $j -o $i.clipkit_${j} ; done ; done
+$ for i in *mafft; do for j in $(echo "smart-gap kpic kpi"); do clipkit $i -m $j -o $i.clipkit_${j} ; done ; done
 ```
 
 
@@ -157,13 +157,13 @@ Solution:
 
 Separate for loop solution:
 ```{bash, eval=F}
-$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_gappyout -gappyout ; done
-$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_strictplus -strictplus ; done
+$ for i in *mafft; do trimal -in $i -out $i.trimal_gappyout -gappyout ; done
+$ for i in *mafft; do trimal -in $i -out $i.trimal_strictplus -strictplus ; done
 ```
 
 Nested for loop solution:
 ```{bash, eval=F}
-$ for i in $(ls *mafft); do for j in $(echo "gappyout strictplus"); do trimal -in $i -out $i.trimal_$j -${j} ; done ; done
+$ for i in *mafft; do for j in $(echo "gappyout strictplus"); do trimal -in $i -out $i.trimal_$j -${j} ; done ; done
 ```
 
 <br>
@@ -184,7 +184,7 @@ Throughout, we will use the latter.
 
 Solution:
 ```{bash, eval=F}
-$ for i in $(ls OG00*); do echo -e -n "$i\t"; pk_aln_len $i ; done
+$ for i in OG00*; do echo -e -n "$i\t"; pk_aln_len $i ; done
 ```
 
 5. `r colorize("For each ortholog, which trimming strategy removed the most sites and which removed the fewest?", "blue")`
@@ -211,6 +211,8 @@ Solution:
 ```{bash, eval=F}
 ClipKIT with the smart-gap parameter and trimAl with the gappyout parameter
 ```
+
+<br>
 
 ## 6. Finished early? Try this challenge :D
 
