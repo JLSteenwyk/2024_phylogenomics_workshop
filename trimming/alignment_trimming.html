@@ -471,26 +471,26 @@ are trying to use isn’t in your path, it is likely in
 <div id="download-and-examine-the-dataset" class="section level2">
 <h2>1. Download and examine the dataset</h2>
 <ol style="list-style-type: decimal">
-<li>With your Guacamole terminal download the data set, the URL is on
-the website [which website?]</li>
+<li>With your Guacamole terminal download the data set, which is
+available here: <a href="https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/trimming/alignment_trimming_data.tar.gz">https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/trimming/alignment_trimming_data.tar.gz</a>.</li>
 </ol>
 <p>Hint:</p>
 <pre class="bash"><code>$ wget http://...</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Confirm that you have downloaded the tar zipped directory
-<code>FILES_trimming_practical.tar.gz</code></li>
+<code>alignment_trimming_data.tar.gz</code></li>
 <li>Unzip the directory</li>
 </ol>
 <p>Hint:</p>
 <pre class="bash"><code># the command is &#39;tar&#39; (&quot;tape archive&quot;)</code></pre>
 <p>solution:</p>
-<pre class="bash"><code>$ tar -zxvf FILES_trimming_practical.tar.gz</code></pre>
+<pre class="bash"><code>$ tar -zxvf alignment_trimming_data.tar.gz</code></pre>
 <ol start="4" style="list-style-type: decimal">
 <li>Change directory into the newly unzipped directory</li>
 <li>Examine the contents of the directory using the <code>ls</code>
 command</li>
 <li><span style="color: blue;">How many files are in
-FILES_trimming_practical?</span></li>
+alignment_trimming_data?</span></li>
 </ol>
 <p><br></p>
 </div>
@@ -506,6 +506,14 @@ documentation</a>.</p>
 <code>clipkit -h</code></li>
 <li><span style="color: blue;">Briefly explain what smart-gap, kpic, and
 kpi trimming modes refer to.</span></li>
+</ol>
+<p>Solution:</p>
+<pre class="bash"><code>Different trimming modes.
+
+smart-gap: dynamic determination of gaps threshold
+kpic: keeps parismony informative and constant sites
+kpi: keep only parsimony informative sites</code></pre>
+<ol start="3" style="list-style-type: decimal">
 <li>Write separate for loops that trim using the smart-gap and kpic, and
 kpi approaches. Challenge: write a nested for loop that trims using both
 methods.</li>
@@ -529,18 +537,22 @@ and <a href="https://gensoft.pasteur.fr/docs/BMGE/1.12/BMGE_doc.pdf">documentati
 <p>Steps:</p>
 <ol style="list-style-type: decimal">
 <li>Examine the help message by executing the following:
-<code>java -jar BMGE.jar -?</code></li>
+<code>BMGE -?</code></li>
 <li><span style="color: blue;">Which parameter specifies the entropy
 threshold?</span></li>
+</ol>
+<p>Separate for loop solution:</p>
+<pre class="bash"><code>-h &lt;thr_max&gt; : real number corresponding to the maximum entropy threshold (ranges from 0 to 1; default: 0.5)</code></pre>
+<ol start="3" style="list-style-type: decimal">
 <li>Write separate for loops that trim using the an entropy threshold of
 0.7 and 0.5. Challenge: write a nested for loop that trims using both
 methods.</li>
 </ol>
 <p>Separate for loop solution:</p>
-<pre class="bash"><code>$ for i in $(ls *mafft); do java -jar BMGE.jar -i $i -t AA -h 0.7 -o $i.BMGE0.7 ; done
-$ for i in $(ls *mafft); do java -jar BMGE.jar -i $i -t AA -h 0.5 -o $i.BMGE0.5 ; done</code></pre>
+<pre class="bash"><code>$ for i in *mafft; do BMGE -i $i -t AA -h 0.7 -o $i.BMGE0.7 ; done
+$ for i in *mafft; do BMGE -i $i -t AA -h 0.5 -o $i.BMGE0.5 ; done</code></pre>
 <p>Nested for loop solution:</p>
-<pre class="bash"><code>$ for i in $(ls *mafft); do for j in $(echo &quot;0.5 0.7&quot;); do java -jar BMGE.jar -i $i -t AA -h $j -o $i.BMGE${j} ; done ; done</code></pre>
+<pre class="bash"><code>$ for i in *mafft; do for j in $(echo &quot;0.5 0.7&quot;); do BMGE -i $i -t AA -h $j -o $i.BMGE${j} ; done ; done</code></pre>
 <p><br></p>
 </div>
 <div id="trim-multiple-sequence-alignments-using-trimal" class="section level2">
@@ -553,13 +565,17 @@ and <a href="http://trimal.cgenomics.org/_media/tutorial.pdf">documentation</a>.
 <code>trimal -h</code></li>
 <li><span style="color: blue;">How are the three trimming modes
 specified?</span></li>
+</ol>
+<p>Solution:</p>
+<pre class="bash"><code>-gappyout, -strict , &amp; -strictplus</code></pre>
+<ol start="3" style="list-style-type: decimal">
 <li>Write separate for loops that trim using the gappyout and strictplus
 approaches. Challenge: write a nested for loop that trims using both
 methods</li>
 </ol>
 <p>Separate for loop solution:</p>
-<pre class="bash"><code>$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_$j -gappyout ; done
-$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_$j -strictplus ; done</code></pre>
+<pre class="bash"><code>$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_gappyout -gappyout ; done
+$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_strictplus -strictplus ; done</code></pre>
 <p>Nested for loop solution:</p>
 <pre class="bash"><code>$ for i in $(ls *mafft); do for j in $(echo &quot;gappyout strictplus&quot;); do trimal -in $i -out $i.trimal_$j -${j} ; done ; done</code></pre>
 <p><br></p>
@@ -577,8 +593,14 @@ functions,” Alignment- and tree-based functions.”</li>
 <li>Since we are calculating lengths of alignments, click
 “Alignment-based functions” and then “Alignment length”</li>
 <li>Write a for loop to calculate the alignment length of each trimmed
-alignment using PhyKIT</li>
+alignment using PhyKIT. Note, PhyKIT can be called two ways:</li>
 </ol>
+<ul>
+<li>phykit <name of function> <options> or the alias</li>
+<li>pk_<name of function>. The primary is a long-hand version and the
+latter is a short hand version that allows you to “tab out” all PhyKIT
+commands. Throughout, we will use the latter.</li>
+</ul>
 <p>Solution:</p>
 <pre class="bash"><code>$ for i in $(ls OG00*); do echo -e -n &quot;$i\t&quot;; pk_aln_len $i ; done</code></pre>
 <ol start="5" style="list-style-type: decimal">
@@ -629,7 +651,11 @@ For example, in the left panel, BMGE with an entropy threshold of 0.3 performed 
 <ol start="2" style="list-style-type: decimal">
 <li>Finished really early? Try making a plot and show a TA!</li>
 </ol>
-<p><br><br> <br><br></p>
+<p>solution:</p>
+<pre class="r"><code>&gt; info_content&lt;-read.table(&quot;&lt;PATH TO RESULTS FILE&gt;/alignment_information_content.txt&quot;)
+&gt; 
+&lt;br&gt;&lt;br&gt;
+&lt;br&gt;&lt;br&gt;</code></pre>
 </div>
 </div>
 

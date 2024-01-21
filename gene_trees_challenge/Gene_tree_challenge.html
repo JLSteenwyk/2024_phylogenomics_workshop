@@ -500,12 +500,12 @@ dataset for this is orthologous groups of genes in FASTA format.</p>
 <li>Polytomy testing and calculating gene support frequencies.</li>
 </ul>
 <p><br></p>
-<div id="download-and-examine-the-dataset" class="section level2">
-<h2>1. Download and examine the dataset</h2>
+<div id="download-and-examine-the-dataset-which-is-available-here" class="section level2">
+<h2>1. Download and examine the dataset, which is available here</h2>
+<p><a href="https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/gene_trees_challenge/gene_tree_challenge_data/data.tar.gz">https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/gene_trees_challenge/gene_tree_challenge_data/data.tar.gz</a>.</p>
 <ol style="list-style-type: decimal">
-<li>Confirm that you have downloaded the necessary tar zipped directory
-TODO: add link to zipped directory and add link to download full dataset
-too.</li>
+<li>Confirm that you have downloaded the necessary tar zipped
+directory</li>
 <li>Unzip the directory</li>
 </ol>
 <p>Hint:</p>
@@ -561,7 +561,7 @@ alignment and trimming algorithm you’d like. In this tutorial, we will
 be using MAFFT and ClipKIT</p>
 <ol style="list-style-type: decimal">
 <li>align each FASTA file using MAFFT with the auto parameter (Bonus: do
-it with a bash loop! Doubble bonus: fix the file names with string
+it with a bash loop! Double bonus: fix the file names with string
 interpolation!)</li>
 </ol>
 <p>Hint:</p>
@@ -573,8 +573,8 @@ $ mafft --auto OG0010342.fa &gt; OG0010342.mafft
 # loop
 $ for i in $(ls OG00*.fa); do mafft --auto $i &gt; $i.mafft ; done
 
-# string interpolation (replacing the *.fa with *.aln.fa)
-$ for i in *.fa; do muscle -align $i -output ${i/.fa/.aln.fa}; done</code></pre>
+# string interpolation (replacing the *.fa with *.mafft)
+$ for i in *.fa; do mafft --auto $i &gt; ${i/.fa/.mafft}; done; done</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>trim each resulting alignment using the default parameters of
 ClipKIT (bonus: use a bash loop again!)</li>
@@ -624,13 +624,15 @@ downstream analyses?</span></li>
 </div>
 <div id="create-a-concatenated-matrix-of-the-resulting-snap-ogs" class="section level2">
 <h2>5. Create a concatenated matrix of the resulting SNAP-OGs</h2>
+<p>This step is a preview of a future practical on concatenation and
+partitioning.</p>
 <p>Among other analyses, SNAP-OGs can be used to infer phylogenomic
 trees. To put into practice what we learned during the concatenation
 practical, we will now create a concatenation matrix using the
 SNAP-OGs.</p>
 <ol style="list-style-type: decimal">
 <li>strip the gene names from the OrthoSNAP outputted files (i.e replace
-‘|’ <strong>pipe</strong> and everything thereafter).</li>
+‘|’ pipe and everything thereafter).</li>
 </ol>
 <p>Hint:</p>
 <pre class="bash"><code># use sed &#39;s///g&#39;
@@ -669,15 +671,16 @@ highest: OG0010342.fa.mafft.clipkit.orthosnap.1.fa
 lowest: OG0017677.fa.mafft.clipkit.orthosnap.0.fa
 
 # Using the partition file, how long is the concatenated alignment?
-There are 2,609 sites.</code></pre>
+There are 2,609 sites. Note, this may slightly vary depending on stochastic choices implemented in MAFFT.</code></pre>
 <p><br></p>
 </div>
 <div id="examining-the-full-dataset" class="section level2">
 <h2>6. Examining the full dataset</h2>
-<p>Set up: 1. Download “full_dataset_trees.tar.gz” 2. Unzip the
-directory. 3. Move ‘hypothesis_1.tre’, ‘hypothesis_2.tre’, and
-‘polytomy_test_groups_file.txt’ in <code>full_dataset_trees</code> to
-the current directory.</p>
+<p>Set up: 1. Download “full_dataset_trees.tar.gz”, which is available
+here <a href="https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/gene_trees_challenge/gene_tree_challenge_data/full_dataset_trees.tar.gz">https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/gene_trees_challenge/gene_tree_challenge_data/full_dataset_trees.tar.gz</a>.
+2. Unzip the directory. 3. Move ‘hypothesis_1.tre’, ‘hypothesis_2.tre’,
+and ‘polytomy_test_groups_file.txt’ in <code>full_dataset_trees</code>
+to the current directory.</p>
 <p>So far, these files represent a subset of a much larger dataset,
 encompassing Eutherian mammals and outgroup taxa. For a long time, the
 evolutionary relationships among Eutherian mammals was contentious.
@@ -760,7 +763,7 @@ taxa)</p>
 <ol start="3" style="list-style-type: decimal">
 <li>Create a file with paths to each SC-OG tree file.</li>
 </ol>
-<pre class="bash"><code>ls FILES_orthosnap_full/ | grep -v &quot;orthosnap&quot; | awk &#39;{print &quot;FILES_orthosnap_full/&quot;$1}&#39; &gt; SC-OG_list.txt</code></pre>
+<pre class="bash"><code>ls full_dataset_trees/ | grep -v &quot;orthosnap&quot; | awk &#39;{print &quot;full_dataset_trees/&quot;$1}&#39; &gt; SC-OG_list.txt</code></pre>
 <ol start="4" style="list-style-type: decimal">
 <li>Conduct the polytomy test using SC-OGs. Here, are only using SC-OGs
 because there are fewer and this step can take longer than others - be

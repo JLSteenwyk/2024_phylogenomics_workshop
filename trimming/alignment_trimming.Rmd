@@ -43,7 +43,8 @@ The dataset for this practical will amino acid FASTA files.
 
 ## 1. Download and examine the dataset 
 
-1.  With your Guacamole terminal download the data set, the URL is on the website [which website?]
+1.  With your Guacamole terminal download the data set, which is available here:
+[https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/trimming/alignment_trimming_data.tar.gz](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/trimming/alignment_trimming_data.tar.gz).
 
 Hint:
 ```{bash, eval=F}
@@ -84,8 +85,9 @@ Different trimming modes.
 
 smart-gap: dynamic determination of gaps threshold
 kpic: keeps parismony informative and constant sites
-kpi: keep only parsimony informative sites)
+kpi: keep only parsimony informative sites
 ```
+
 3. Write separate for loops that trim using the smart-gap and kpic, and kpi approaches. Challenge: write a nested for loop that trims using both methods.
  
 Hint:
@@ -126,13 +128,13 @@ Separate for loop solution:
  
 Separate for loop solution:
 ```{bash, eval=F}
-$ for i in $(ls *mafft); do BMGE -i $i -t AA -h 0.7 -o $i.BMGE0.7 ; done
-$ for i in $(ls *mafft); do BMGE -i $i -t AA -h 0.5 -o $i.BMGE0.5 ; done
+$ for i in *mafft; do BMGE -i $i -t AA -h 0.7 -o $i.BMGE0.7 ; done
+$ for i in *mafft; do BMGE -i $i -t AA -h 0.5 -o $i.BMGE0.5 ; done
 ```
 
 Nested for loop solution:
 ```{bash, eval=F}
-$ for i in $(ls *mafft); do for j in $(echo "0.5 0.7"); do BMGE -i $i -t AA -h $j -o $i.BMGE${j} ; done ; done
+$ for i in *mafft; do for j in $(echo "0.5 0.7"); do BMGE -i $i -t AA -h $j -o $i.BMGE${j} ; done ; done
 ```
 
 <br>

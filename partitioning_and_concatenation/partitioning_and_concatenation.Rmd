@@ -31,7 +31,7 @@ Additionally, if the software you are trying to use isn’t in your path, it is 
 
 # Protocol {-}
 
-This objective is divided in three parts:
+This objective is divided in four parts:
 
 * Download and examine the dataset 
 * Concatenate the amino acid FASTA files with PhyKIT 
@@ -64,8 +64,8 @@ Solution:
 $ tar -zxvf partitioning_and_concatenation_data.tar.gz
 ```
 
-4. Change directory into the newly unzipped directory
-5. Examine the contents of the directory using the ls command
+4. Change directory into the newly unzipped directory [using the cd command]
+5. Examine the contents of the directory [using the ls command]
 6. `r colorize("How many directories are in FILES_concat_and_model_testing_practical?", "blue")`
 
 <br><br>
@@ -89,11 +89,21 @@ Hint:
 # they are aligned and trimmed using mafft and trimal and have “.fa.mafft.trimal” as suffixes
 ```
 
+Solution:
+```{bash, eval=F}
+There are five files.
+```
+
 4. `r colorize("All FASTA files have the same set of taxa. How many taxa are in each FASTA file?", "blue")`
 
 Hint:
 ```{r, eval=F}
 # use “grep” and “wc -l”
+```
+
+Solution:
+```{bash, eval=F}
+There are 20 taxa.
 ```
 
 5. PhyKIT will be used for constructing the concatenated matrix. PhyKIT comes with a diverse suite of utilities. Examine all of the PhyKIT functions by examining the help message.
@@ -163,13 +173,29 @@ Hint:
 # answers to these questions can be found in concat_partition_testing.iqtree file
 ```
 
+Solution:
+```{bash, eval=F}
+Find the portion of the file that is as follows:
+
+  ID  Name               Type	Seq	Site	Unique	Infor	Invar	Const
+   1  part1+part3+part4  AA	20	1345	527	418	832	832
+   2  part2              AA	20	573	301	253	286	286
+   3  part5              AA	20	287	256	207	46	46
+
+This communicates that there are three final partitions and that part1+part3+part4 were combined into a single partition.
+
+The best fit models are detailed on the following line in the results file
+
+Best-fit model according to BIC: LG+I+G4:part1+part3+part4,LG+I+G4:part2,LG+G4:part5
+```
+
 3. Determine the number of partitions that can describe the data using the ModelFinderPlus scheme within IQTREE using the following command:
 
 ```{bash, eval=F}
 iqtree2 -s concat.fa -spp concat.partition.nex -m MF+MERGE -pre concat_partition_MFP
 ```
 
-Note, this may take longer. Be patient and check on how your neighbor is doing.
+Note, this may take longer. Be patient and check on how your neighbor is doing. This takes about 5 min.
 
 4. Examine the resulting outputs to determine the following:
 * `r colorize("How many partitions were made?", "blue")`
@@ -177,8 +203,35 @@ Note, this may take longer. Be patient and check on how your neighbor is doing.
 * `r colorize("What models best fit each partition?", "blue")`
 * `r colorize("How do these results using TESTMERGEONLY and MF+MERGE differ?", "blue")`
 
+Hint:
+```{r, eval=F}
+# answers to these questions can be found in .iqtree results file
+```
+
+Solution:
+```{bash, eval=F}
+Find the portion of the file that is as follows:
+
+  ID  Name               Type	Seq	Site	Unique	Infor	Invar	Const
+   1  part1+part3+part4  AA	20	1345	527	418	832	832
+   2  part2              AA	20	573	301	253	286	286
+   3  part5              AA	20	287	256	207	46	46
+
+This communicates that there are three final partitions and that part1+part3+part4 were combined into a single partition.
+
+The best fit models are detailed on the following line in the results file
+
+Best-fit model according to BIC: LG+R3:part1+part3+part4,LG+R4:part2,LG+G4:part5
+
+
+These results differ from TESTMERGEONLY because partition 1 and 2 had better fitting free rate models. As described in IQTREE documentation,
+the FreeRate model generalizes the +G model by relaxing the assumption of Gamma-distributed rates.
+
+The number describes how many rate categories there are. So, R3 has three rate categories.
+```
+
 5. Alternatively, a single best fitting substitution model can be determined by excluding the partition file and removing the `MERGE` from the model testing argument.
-For the sake of faster computation, test standard substitution models in the concatenated matrix.
+For the sake of faster computation, test standard substitution models in the concatenated matrix. 
 
 ```{bash, eval=F}
 iqtree2 -s concat.fa -m TESTONLY -pre concat_partition_single_model
@@ -189,6 +242,21 @@ iqtree2 -s concat.fa -m TESTONLY -pre concat_partition_single_model
 * `r colorize("Would the model that was selected be different if AIC was used instead of BIC to evaluate model fit?", "blue")`
 * `r colorize("Refer to IQ-TREE documentation to better understand what exactly is different.", "blue")` [IQTREE Substitution-Models Documentation](http://www.iqtree.org/doc/Substitution-Models)
 
+Solution
+```{bash, eval=F}
+# What was the best fitting substitution model?
+Best-fit model according to BIC: LG+I+G4
+
+# Would the model that was selected be different if AIC was used instead of BIC to evaluate model fit?
+Check the .log file, where you will find the following:
+Akaike Information Criterion:           LG+F+I+G4
+Corrected Akaike Information Criterion: LG+F+I+G4
+Bayesian Information Criterion:         LG+I+G4
+Best-fit model: LG+I+G4 chosen according to BIC
+
+AIC and AICc will have the extra parameter +F, which stands for empirical base frequencies.
+```
+
 7. Rather than testing all possible substutiton models, researchers may want to test specific subsets.
 For example, suppose the best fitting substitution model for a given gene is `LG+F+G`. This site-homogeneous 
 model applies one reversible substitution matrix and the same character frequencies for all sites in a data
@@ -197,7 +265,7 @@ differ across sites. Models that incorporate this complexity into a maximum like
 In doing so, profile mixture models help combat saturation by multiple substitutions, a well known source of 
 phylogenomic error.
 
-Test model fit across the site homogenous model `LG` and `LG` with varying amino acid equilibrium frequencies across sites using the following command:
+Test model fit across the site homogenous model `LG` and `LG` with varying amino acid equilibrium frequencies across sites using the following command, which takes about 10 minutes:
 
 ```{bash, eval=F}
 iqtree2 -s concat.fa -m TESTONLY -mset LG+G4,LG+C20,LG+C60 -pre concat_partition_site_heterogeneous

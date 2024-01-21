@@ -458,7 +458,7 @@ are trying to use isn’t in your path, it is likely in
 <p><br></p>
 <div id="protocol" class="section level1 unnumbered">
 <h1 class="unnumbered">Protocol</h1>
-<p>This objective is divided in three parts:</p>
+<p>This objective is divided in four parts:</p>
 <ul>
 <li>Download and examine the dataset</li>
 <li>Concatenate the amino acid FASTA files with PhyKIT</li>
@@ -473,7 +473,7 @@ phylogenetic trees and alignments</li>
 <h1>1. Download and examine the dataset</h1>
 <ol style="list-style-type: decimal">
 <li>With your Guacamole terminal download the data set using the
-following URL: <a href="https://github.com/JLSteenwyk/2024_phylogenomics_workshop/blob/main/partitioning_and_concatenation_data/partitioning_and_concatenation_data.tar.gz" class="uri">https://github.com/JLSteenwyk/2024_phylogenomics_workshop/blob/main/partitioning_and_concatenation_data/partitioning_and_concatenation_data.tar.gz</a></li>
+following URL: <a href="https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/partitioning_and_concatenation/partitioning_and_concatenation_data.tar.gz">https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/partitioning_and_concatenation/partitioning_and_concatenation_data.tar.gz</a>.</li>
 </ol>
 <p>Hint:</p>
 <pre class="bash"><code>$ wget http://...</code></pre>
@@ -487,8 +487,9 @@ following URL: <a href="https://github.com/JLSteenwyk/2024_phylogenomics_worksho
 <p>Solution:</p>
 <pre class="bash"><code>$ tar -zxvf partitioning_and_concatenation_data.tar.gz</code></pre>
 <ol start="4" style="list-style-type: decimal">
-<li>Change directory into the newly unzipped directory</li>
-<li>Examine the contents of the directory using the ls command</li>
+<li>Change directory into the newly unzipped directory [using the cd
+command]</li>
+<li>Examine the contents of the directory [using the ls command]</li>
 <li><span style="color: blue;">How many directories are in
 FILES_concat_and_model_testing_practical?</span></li>
 </ol>
@@ -510,12 +511,16 @@ there?</span></p>
 <p>Hint:</p>
 <pre class="r"><code># they are aligned and trimmed using mafft and trimal and have
 # “.fa.mafft.trimal” as suffixes</code></pre>
+<p>Solution:</p>
+<pre class="bash"><code>There are five files.</code></pre>
 <ol start="4" style="list-style-type: decimal">
 <li><span style="color: blue;">All FASTA files have the same set of
 taxa. How many taxa are in each FASTA file?</span></li>
 </ol>
 <p>Hint:</p>
 <pre class="r"><code># use “grep” and “wc -l”</code></pre>
+<p>Solution:</p>
+<pre class="bash"><code>There are 20 taxa.</code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li>PhyKIT will be used for constructing the concatenated matrix. PhyKIT
 comes with a diverse suite of utilities. Examine all of the PhyKIT
@@ -534,7 +539,7 @@ PhyKIT. Give the output the prefix “concat”.</li>
 </ol>
 <p>Solution:</p>
 <pre class="bash"><code>ls EOG092D* &gt; alignments.txt
-pk_create_concat -a alignments.txt -pre concat</code></pre>
+pk_create_concat -a alignments.txt -p concat</code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>Three output files were created.</li>
 </ol>
@@ -550,8 +555,11 @@ format. What information does this format provide?</span></li>
 <ol start="8" style="list-style-type: decimal">
 <li>Certain programs require nexus formatted partition files. To prepare
 you for creating nexus files, modify concat.partition to be in nexus
-format with the following command using an “in-house script”:</li>
+format with the following command using an “in-house script”, which can
+be downloaded from GitHub using the following link: <a href="https://raw.githubusercontent.com/JLSteenwyk/2024_phylogenomics_workshop/main/partitioning_and_concatenation/partition2nexus.sh">https://raw.githubusercontent.com/JLSteenwyk/2024_phylogenomics_workshop/main/partitioning_and_concatenation/partition2nexus.sh</a></li>
 </ol>
+<p>And to use the file, we must first change permissions:</p>
+<pre class="bash"><code>chmod 777 partition2nexus.sh</code></pre>
 <pre class="bash"><code>bash partition2nexus.sh concat.partition &gt; concat.partition.nex</code></pre>
 <ol start="9" style="list-style-type: decimal">
 <li>Examine the contents of the resulting file</li>
@@ -599,6 +607,19 @@ among a finite set of models.</li>
 <p>Hint:</p>
 <pre class="r"><code># answers to these questions can be found in concat_partition_testing.iqtree
 # file</code></pre>
+<p>Solution:</p>
+<pre class="bash"><code>Find the portion of the file that is as follows:
+
+  ID  Name               Type   Seq Site    Unique  Infor   Invar   Const
+   1  part1+part3+part4  AA 20  1345    527 418 832 832
+   2  part2              AA 20  573 301 253 286 286
+   3  part5              AA 20  287 256 207 46  46
+
+This communicates that there are three final partitions and that part1+part3+part4 were combined into a single partition.
+
+The best fit models are detailed on the following line in the results file
+
+Best-fit model according to BIC: LG+I+G4:part1+part3+part4,LG+I+G4:part2,LG+G4:part5</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li>Determine the number of partitions that can describe the data using
 the ModelFinderPlus scheme within IQTREE using the following
@@ -606,7 +627,7 @@ command:</li>
 </ol>
 <pre class="bash"><code>iqtree2 -s concat.fa -spp concat.partition.nex -m MF+MERGE -pre concat_partition_MFP</code></pre>
 <p>Note, this may take longer. Be patient and check on how your neighbor
-is doing.</p>
+is doing. This takes about 5 min.</p>
 <ol start="4" style="list-style-type: decimal">
 <li>Examine the resulting outputs to determine the following:</li>
 </ol>
@@ -618,8 +639,29 @@ combined?</span></li>
 <li><span style="color: blue;">What models best fit each
 partition?</span></li>
 <li><span style="color: blue;">How do these results using TESTMERGEONLY
-and MF+MERGE?</span></li>
+and MF+MERGE differ?</span></li>
 </ul>
+<p>Hint:</p>
+<pre class="r"><code># answers to these questions can be found in .iqtree results file</code></pre>
+<p>Solution:</p>
+<pre class="bash"><code>Find the portion of the file that is as follows:
+
+  ID  Name               Type   Seq Site    Unique  Infor   Invar   Const
+   1  part1+part3+part4  AA 20  1345    527 418 832 832
+   2  part2              AA 20  573 301 253 286 286
+   3  part5              AA 20  287 256 207 46  46
+
+This communicates that there are three final partitions and that part1+part3+part4 were combined into a single partition.
+
+The best fit models are detailed on the following line in the results file
+
+Best-fit model according to BIC: LG+R3:part1+part3+part4,LG+R4:part2,LG+G4:part5
+
+
+These results differ from TESTMERGEONLY because partition 1 and 2 had better fitting free rate models. As described in IQTREE documentation,
+the FreeRate model generalizes the +G model by relaxing the assumption of Gamma-distributed rates.
+
+The number describes how many rate categories there are. So, R3 has three rate categories.</code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li>Alternatively, a single best fitting substitution model can be
 determined by excluding the partition file and removing the
@@ -641,6 +683,18 @@ fit?</span></li>
 understand what exactly is different.</span> <a href="http://www.iqtree.org/doc/Substitution-Models">IQTREE
 Substitution-Models Documentation</a></li>
 </ul>
+<p>Solution</p>
+<pre class="bash"><code># What was the best fitting substitution model?
+Best-fit model according to BIC: LG+I+G4
+
+# Would the model that was selected be different if AIC was used instead of BIC to evaluate model fit?
+Check the .log file, where you will find the following:
+Akaike Information Criterion:           LG+F+I+G4
+Corrected Akaike Information Criterion: LG+F+I+G4
+Bayesian Information Criterion:         LG+I+G4
+Best-fit model: LG+I+G4 chosen according to BIC
+
+AIC and AICc will have the extra parameter +F, which stands for empirical base frequencies.</code></pre>
 <ol start="7" style="list-style-type: decimal">
 <li>Rather than testing all possible substutiton models, researchers may
 want to test specific subsets. For example, suppose the best fitting
@@ -656,8 +710,8 @@ a well known source of phylogenomic error.</li>
 </ol>
 <p>Test model fit across the site homogenous model <code>LG</code> and
 <code>LG</code> with varying amino acid equilibrium frequencies across
-sites using the following command:</p>
-<pre class="bash"><code>iqtree2 -s concat.fa -m TESTONLY -mset LG+G4,LG+C20,LG+C60 -pre concat_partition_concat_partition_site_heterogeneous</code></pre>
+sites using the following command, which takes about 10 minutes:</p>
+<pre class="bash"><code>iqtree2 -s concat.fa -m TESTONLY -mset LG+G4,LG+C20,LG+C60 -pre concat_partition_site_heterogeneous</code></pre>
 <ol start="8" style="list-style-type: decimal">
 <li>Examine the resulting outputs and address the following:</li>
 </ol>
@@ -787,6 +841,8 @@ different phylogenetic tree?</span></li>
 </ol>
 <pre class="bash"><code># Note, this may slightly differ depending on stochastic variation between runs.
 ls concat_*treefile | grep -v &quot;partition&quot; | while read i ; do pk_rf_dist concat.fa.treefile $i ; done</code></pre>
+<p><em>BONUS</em>: visualize these phylogenies using lessons learned in
+previous labs to identify what bipartitions differ.</p>
 <ol start="9" style="list-style-type: decimal">
 <li>In many instances, each subsampling strategy resulted in a different
 phylogenetic tree. What does this suggest?</li>
