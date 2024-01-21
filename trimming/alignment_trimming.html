@@ -457,7 +457,7 @@ are trying to use isn’t in your path, it is likely in
 <p><br></p>
 <div id="protocol" class="section level1 unnumbered">
 <h1 class="unnumbered">Protocol</h1>
-<p>This objective is divided in three parts:</p>
+<p>This objective is divided in five parts:</p>
 <ul>
 <li>Download and examine the dataset</li>
 <li>Trim multiple sequence alignments using ClipKIT<br />
@@ -466,7 +466,7 @@ are trying to use isn’t in your path, it is likely in
 <li>Trim multiple sequence alignments using trimAl</li>
 <li>Examine the resulting alignment lengths using PhyKIT</li>
 </ul>
-<p>The dataset for this practical will amino acid FASTA files.</p>
+<p>The dataset for this practical will be amino acid FASTA files.</p>
 <p><br></p>
 <div id="download-and-examine-the-dataset" class="section level2">
 <h2>1. Download and examine the dataset</h2>
@@ -522,11 +522,11 @@ methods.</li>
 <pre class="bash"><code>The general structure of a for loop is:
 for i in $(&lt;list of files&gt;); do &lt;action&gt; ; done</code></pre>
 <p>Separate for loop solution:</p>
-<pre class="bash"><code>$ for i in $(ls *mafft); do clipkit $i -m smart-gap -o $i.clipkit_smart-gap; done
-$ for i in $(ls *mafft); do clipkit $i -m kpic -o $i.clipkit_kpic; done
-$ for i in $(ls *mafft); do clipkit $i -m kpi -o $i.clipkit_kpi; done</code></pre>
+<pre class="bash"><code>$ for i in *mafft; do clipkit $i -m smart-gap -o $i.clipkit_smart-gap; done
+$ for i in *mafft; do clipkit $i -m kpic -o $i.clipkit_kpic; done
+$ for i in *mafft; do clipkit $i -m kpi -o $i.clipkit_kpi; done</code></pre>
 <p>Nested for loop solution:</p>
-<pre class="bash"><code>$ for i in $(ls *mafft); do for j in $(echo &quot;smart-gap kpic kpi&quot;); do clipkit $i -m $j -o $i.clipkit_${j} ; done ; done</code></pre>
+<pre class="bash"><code>$ for i in *mafft; do for j in $(echo &quot;smart-gap kpic kpi&quot;); do clipkit $i -m $j -o $i.clipkit_${j} ; done ; done</code></pre>
 <p><br></p>
 </div>
 <div id="trim-multiple-sequence-alignments-using-bmge" class="section level2">
@@ -574,10 +574,10 @@ approaches. Challenge: write a nested for loop that trims using both
 methods</li>
 </ol>
 <p>Separate for loop solution:</p>
-<pre class="bash"><code>$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_gappyout -gappyout ; done
-$ for i in $(ls *mafft); do trimal -in $i -out $i.trimal_strictplus -strictplus ; done</code></pre>
+<pre class="bash"><code>$ for i in *mafft; do trimal -in $i -out $i.trimal_gappyout -gappyout ; done
+$ for i in *mafft; do trimal -in $i -out $i.trimal_strictplus -strictplus ; done</code></pre>
 <p>Nested for loop solution:</p>
-<pre class="bash"><code>$ for i in $(ls *mafft); do for j in $(echo &quot;gappyout strictplus&quot;); do trimal -in $i -out $i.trimal_$j -${j} ; done ; done</code></pre>
+<pre class="bash"><code>$ for i in *mafft; do for j in $(echo &quot;gappyout strictplus&quot;); do trimal -in $i -out $i.trimal_$j -${j} ; done ; done</code></pre>
 <p><br></p>
 </div>
 <div id="examine-the-resulting-alignment-lengths-using-phykit" class="section level2">
@@ -602,7 +602,7 @@ latter is a short hand version that allows you to “tab out” all PhyKIT
 commands. Throughout, we will use the latter.</li>
 </ul>
 <p>Solution:</p>
-<pre class="bash"><code>$ for i in $(ls OG00*); do echo -e -n &quot;$i\t&quot;; pk_aln_len $i ; done</code></pre>
+<pre class="bash"><code>$ for i in OG00*; do echo -e -n &quot;$i\t&quot;; pk_aln_len $i ; done</code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li><p><span style="color: blue;">For each ortholog, which trimming
 strategy removed the most sites and which removed the
@@ -634,6 +634,7 @@ length with no gaps?</span></li>
 </ol>
 <p>Solution:</p>
 <pre class="bash"><code>ClipKIT with the smart-gap parameter and trimAl with the gappyout parameter</code></pre>
+<p><br></p>
 </div>
 <div id="finished-early-try-this-challenge-d" class="section level2">
 <h2>6. Finished early? Try this challenge :D</h2>
@@ -651,11 +652,7 @@ For example, in the left panel, BMGE with an entropy threshold of 0.3 performed 
 <ol start="2" style="list-style-type: decimal">
 <li>Finished really early? Try making a plot and show a TA!</li>
 </ol>
-<p>solution:</p>
-<pre class="r"><code>&gt; info_content&lt;-read.table(&quot;&lt;PATH TO RESULTS FILE&gt;/alignment_information_content.txt&quot;)
-&gt; 
-&lt;br&gt;&lt;br&gt;
-&lt;br&gt;&lt;br&gt;</code></pre>
+<p><br><br> <br><br></p>
 </div>
 </div>
 
