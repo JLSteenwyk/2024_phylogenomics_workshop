@@ -18,11 +18,13 @@ colorize <- function(x, color) {
   } else x
 }
 ```
-Multiple sequence alignment trimming is a common step in phylogenomic workflows and aims to reduce errors/uninformative sites in alignments. Reducing total alignment size can save downstream computation time, but excessive trimming can be a source of error.
+Multiple sequence alignment trimming is a common step in phylogenomic workflows and aims to reduce errors/uninformative sites in alignments.
+Reducing total alignment size can save downstream computation time, but excessive trimming can be a source of error.
 
 Here, we will be trimming multiple sequence alignments using multiple strategies and examining the resulting alignment lengths.
 
-Note, steps within objectives that have fill-in-the-blank prompts are indicated as such using `r colorize("blue", "blue")` color font. Please fill in these prompts.
+Note, steps within objectives that have fill-in-the-blank prompts are indicated as such using `r colorize("blue", "blue")` color font.
+Please fill in these prompts.
 Additionally, if the software you are trying to use isn’t in your path, it is likely in `~/software`.
 
 <br>
@@ -37,7 +39,7 @@ This objective is divided in three parts:
 * Trim multiple sequence alignments using trimAl
 * Examine the resulting alignment lengths using PhyKIT
 
-The dataset for this practical will amino acid FASTA files.
+The dataset for this practical will be amino acid FASTA files.
 
 <br>
 
