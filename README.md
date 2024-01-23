@@ -15,6 +15,8 @@
 
 ### Alignment trimming laboratory
 
+* [Presentation](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/blob/main/Trimming.pdf)
+
 * [Worksheet](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/blob/main/trimming/alignment_trimming.html)
 
 * [Data](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/trimming/alignment_trimming_data.tar.gz)
