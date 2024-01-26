@@ -51,14 +51,14 @@ As noted above, the dataset for this practical comes from [Steenwyk et al. (2019
 ## 1. Clone and examine the dataset 
 
 1.  With your Guacamole terminal download the data set, which is available here:
-[FILL](FILL).
+[https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/incongruence/confidence_measures.tar.gz](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/incongruence/confidence_measures.tar.gz).
 
 Hint:
 ```{bash, eval=F}
 $ wget http://...
 ```
 
-2. Confirm that you have downloaded the tar zipped directory `FILL`
+2. Confirm that you have downloaded the tar zipped directory `confidence_measures.tar.gz`
 3. Unzip the directory
 
 Hint:
