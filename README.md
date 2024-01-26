@@ -51,6 +51,6 @@
 
 * [Challenge information](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/blob/main/Wednesday_challenge_information.pdf)
 
-* [Data](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/blob/main/partitioning_and_concatenation/partitioning_and_concatenation.html)
+* [Data](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/Wednesday_challenge_data.tar.gz)
 
 <br />
