@@ -36,19 +36,21 @@ Additionally, if the software you are trying to use isn’t in your path, it is 
 
 # Protocol {-}
 
-This objective is divided in five parts:
+This objective is divided in seven parts:
 
-* Clone and examine the dataset 
+* Download and examine the dataset 
+* How to collapse branches by a support threshold
 * Prepare the necessary input files and calculate internode certainty and related measures
 * Identify bipartitions with low internode certainty values
 * Determine gene support frequency and concordance factors for the reference and alternative topology at the contentious internode
 * Calculate gene-wise and site-wise phylogenetic signal
+* BONUS challenge
 
 As noted above, the dataset for this practical comes from [Steenwyk et al. (2019) *mBio*](https://jlsteenwyk.com/publication_pdfs/2019_Steenwyk_et_al_mBio.pdf).
 
 <br>
 
-## 1. Clone and examine the dataset 
+## 1. Download and examine the dataset 
 
 1.  With your Guacamole terminal download the data set, which is available here:
 [https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/incongruence/confidence_measures.tar.gz](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/incongruence/confidence_measures.tar.gz).
@@ -77,7 +79,78 @@ $ tar -zxvf confidence_measures.tar.gz
 
 <br>
 
-## 2. Prepare the necessary input files and calculate internode certainty and related measures
+## 2. How to collapse branches by a support threshold
+As described in the lecture, it can be helpful to collapse poorly support branches before, for example, species tree infernece using summary tree methods.
+Collapsing poorly supported branches can help account for gene tree uncertainty because the summary tree methods assume gene trees are otherwise
+accurate. To do so, we will use the PhyKIT function [collapse_branches](https://jlsteenwyk.com/PhyKIT/usage/index.html#collapse-bipartitions).
+
+Steps:
+1. Change directory into `FILES_collapsing_across_thresholds`.
+2. Write a nested for loop and collapse the branches of each phylogenetic tree with thresholds of 80, 70, and 60 using the [collapse_branches](https://jlsteenwyk.com/PhyKIT/usage/index.html#collapse-bipartitions) function.
+
+Solution
+```{bash, eval=f}
+for j in $(echo "60 70 80"); do for i in $(ls *treefile) ; do echo $i $j ; pk_collapse_branches $i -s $j -o $i.${j}collapsed ; done ; done
+```
+
+3. Count the number of internal branches in each file and each threshold (including no collapsing) using a nested `for` loop. Make the output be nicely. 
+Hint
+```{bash, eval=f}
+# The first question is how do we count internal branches in a phylogenetic tree? 
+# I know an indirect way we can do this using the `internal_branch_stats` function of PhyKIT.
+
+# PhyKIT functions that print out summary statistics (mean, medians, etc.) have a verbose option, -v/--verbose.
+# When using the verbose option, raw data is outputted instead. Thus, we can obtain internal branch length information
+# using the `internal_branch_stats` function but use the verbose option (-v/--verbose) and get the length of each internal branch.
+# Thereafter, we can count how many internal branches there are and calculate the difference to see how many were collapsed.
+```
+
+Solution
+```{bash, eval=f}
+for i in *treefile ; do
+  cnt=$(pk_internal_branch_stats $i -v | wc -l) # count internal branches in the uncollapsed case
+  for j in $(echo "60 70 80"); do
+    coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) $ count internal branches in the collapsed case
+    num_coll=$(expr $cnt - $coll_cnt) # substract the collapsed number of internal branches from the uncollapsed number of internal branches 
+    echo -e "$i\t$j\t$cnt\t$coll_cnt\t$num_coll"
+  done ;
+done
+
+OG0002050.fa.mafft.clipkit.treefile	60	21	20	1
+OG0002050.fa.mafft.clipkit.treefile	70	21	20	1
+OG0002050.fa.mafft.clipkit.treefile	80	21	17	4
+OG0002051.fa.mafft.clipkit.treefile	60	21	19	2
+OG0002051.fa.mafft.clipkit.treefile	70	21	18	3
+OG0002051.fa.mafft.clipkit.treefile	80	21	14	7
+OG0002053.fa.mafft.clipkit.treefile	60	21	20	1
+OG0002053.fa.mafft.clipkit.treefile	70	21	20	1
+OG0002053.fa.mafft.clipkit.treefile	80	21	19	2
+```
+
+4. `r colorize("Which tree had the most branches collapsed and under what collapsing threshold?", "blue")`
+Solution
+```{bash, eval=f}
+OG0002051.fa.mafft.clipkit.treefile had 7 branches that were collapsed
+```
+
+5. Examine the tree in `OG0002051.fa.mafft.clipkit.treefile.70collapsed`. 
+`r colorize("Are shallow or deep branches collapsed? Why are is your answer more likely to be collapsed?", "blue")`
+
+Hint
+```{bash, eval=f}
+# This command allows you to quickly view a phylogenetic tree in the terminal by printing a tree in ASCII characters.
+pk_print_tree OG0002051.fa.mafft.clipkit.treefile.70collapsed -r
+
+# the -r argument removes branch length information making it easier to see which branches got collapsed
+```
+
+Solution
+```{bash, eval=f}
+Often, deeper branches in a phylogeny will have lower support values because more ancient divergences are more difficult to
+accurately infer. Thus, deeper, not shallower, branches are more likely to be collapsed.
+```
+
+## 3. Prepare the necessary input files and calculate internode certainty and related measures
 
 * The necessary input files to calculate internode certainty using RAxML include the putative species tree and evaluation trees.
 * The species tree has been provided and is named Asp_Pen_phylo.subset.new. It contains a subset group of eleven taxa from the original 82 taxa dataset [Steenwyk et al. (2019) *mBio*](https://jlsteenwyk.com/publication_pdfs/2019_Steenwyk_et_al_mBio.pdf)
@@ -129,7 +202,7 @@ where grep searches for the string ‘Tree certainty’ and ‘Relative tree’ 
 * Tree certainty all including all conflicting bipartitions.
 * Relative tree certainty all including all conflicting bipartitions.
 
-## 3. Identify bipartitions with low internode certainty values
+## 4. Identify bipartitions with low internode certainty values
 
 To examine internode certainty values among bipartitions in our putative species tree,
 we will first execute a script that replaces bootstrap values with internode support values
@@ -168,7 +241,7 @@ Solution:
 The branch at the ancestor of M. ruber and P. camemberti has a low IC value.
 ```
 
-## 4. Determine gene support frequency and concordance factors for the reference and alternative topology at the contentious internode
+## 5. Determine gene support frequency and concordance factors for the reference and alternative topology at the contentious internode
 * To determine gene support frequency, we will use RAxML. Note, you have previously calculate gene support frequencies with PhyKIT when you used the `pk_ptt` function.
 * To determine concordance factors, we will use IQ-Tree.
 
@@ -244,7 +317,7 @@ Solution:
 0/36.2
 ```
 
-## 5. Calculate gene-wise and site-wise phylogenetic signal
+## 6. Calculate gene-wise and site-wise phylogenetic signal
 To determine gene-wise and site-wise phylogenetic signal, we will follow protocol first described in 
 [Shen et al. (2017), Nature Ecology and Evolution](https://www.nature.com/articles/s41559-017-0126)
 and calculate gene-wise and site-wise log-likelihood scores. We will use IQ-Tree to facilitate the analysis.
@@ -371,14 +444,13 @@ Solution
 No
 ```
 
-## Bonus
-1. Using only starting data of gene trees, use internode certainty to determine which dataset has greater consistency of single-gene trees across four datasets...
+## 7. Bonus
+1. Using only starting data of gene trees, use internode certainty (and/or related measures) to rank the following datasets from most consistent among single-gene trees to least.
+The four datasets are: 
 * Eutheria, a lineage of mammals,
 * budding yeasts,
 * filamentous fungi, and
 * mammals
-
-**Rank datasets from those with the most to least internode certainty.**
 
 <br>
 
