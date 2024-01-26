@@ -466,21 +466,23 @@ are trying to use isn’t in your path, it is likely in
 <p><br></p>
 <div id="protocol" class="section level1 unnumbered">
 <h1 class="unnumbered">Protocol</h1>
-<p>This objective is divided in five parts:</p>
+<p>This objective is divided in seven parts:</p>
 <ul>
-<li>Clone and examine the dataset</li>
+<li>Download and examine the dataset</li>
+<li>How to collapse branches by a support threshold</li>
 <li>Prepare the necessary input files and calculate internode certainty
 and related measures</li>
 <li>Identify bipartitions with low internode certainty values</li>
 <li>Determine gene support frequency and concordance factors for the
 reference and alternative topology at the contentious internode</li>
 <li>Calculate gene-wise and site-wise phylogenetic signal</li>
+<li>BONUS challenge</li>
 </ul>
 <p>As noted above, the dataset for this practical comes from <a href="https://jlsteenwyk.com/publication_pdfs/2019_Steenwyk_et_al_mBio.pdf">Steenwyk
 et al. (2019) <em>mBio</em></a>.</p>
 <p><br></p>
-<div id="clone-and-examine-the-dataset" class="section level2">
-<h2>1. Clone and examine the dataset</h2>
+<div id="download-and-examine-the-dataset" class="section level2">
+<h2>1. Download and examine the dataset</h2>
 <ol style="list-style-type: decimal">
 <li>With your Guacamole terminal download the data set, which is
 available here: <a href="https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/incongruence/confidence_measures.tar.gz">https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/incongruence/confidence_measures.tar.gz</a>.</li>
@@ -505,8 +507,74 @@ confidence_measures?</span></li>
 </ol>
 <p><br></p>
 </div>
+<div id="how-to-collapse-branches-by-a-support-threshold" class="section level2">
+<h2>2. How to collapse branches by a support threshold</h2>
+<p>As described in the lecture, it can be helpful to collapse poorly
+support branches before, for example, species tree infernece using
+summary tree methods. Collapsing poorly supported branches can help
+account for gene tree uncertainty because the summary tree methods
+assume gene trees are otherwise accurate. To do so, we will use the
+PhyKIT function <a href="https://jlsteenwyk.com/PhyKIT/usage/index.html#collapse-bipartitions">collapse_branches</a>.</p>
+<p>Steps: 1. Change directory into
+<code>FILES_collapsing_across_thresholds</code>. 2. Write a nested for
+loop and collapse the branches of each phylogenetic tree with thresholds
+of 80, 70, and 60 using the <a href="https://jlsteenwyk.com/PhyKIT/usage/index.html#collapse-bipartitions">collapse_branches</a>
+function.</p>
+<p>Solution</p>
+<pre class="bash"><code>for j in $(echo &quot;60 70 80&quot;); do for i in $(ls *treefile) ; do echo $i $j ; pk_collapse_branches $i -s $j -o $i.${j}collapsed ; done ; done</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>Count the number of internal branches in each file and each
+threshold (including no collapsing) using a nested <code>for</code>
+loop. Make the output be nicely. Hint</li>
+</ol>
+<pre class="bash"><code># The first question is how do we count internal branches in a phylogenetic tree? 
+# I know an indirect way we can do this using the `internal_branch_stats` function of PhyKIT.
+
+# PhyKIT functions that print out summary statistics (mean, medians, etc.) have a verbose option, -v/--verbose.
+# When using the verbose option, raw data is outputted instead. Thus, we can obtain internal branch length information
+# using the `internal_branch_stats` function but use the verbose option (-v/--verbose) and get the length of each internal branch.
+# Thereafter, we can count how many internal branches there are and calculate the difference to see how many were collapsed.</code></pre>
+<p>Solution</p>
+<pre class="bash"><code>for i in *treefile ; do
+  cnt=$(pk_internal_branch_stats $i -v | wc -l) # count internal branches in the uncollapsed case
+  for j in $(echo &quot;60 70 80&quot;); do
+    coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) $ count internal branches in the collapsed case
+    num_coll=$(expr $cnt - $coll_cnt) # substract the collapsed number of internal branches from the uncollapsed number of internal branches 
+    echo -e &quot;$i\t$j\t$cnt\t$coll_cnt\t$num_coll&quot;
+  done ;
+done
+
+OG0002050.fa.mafft.clipkit.treefile 60  21  20  1
+OG0002050.fa.mafft.clipkit.treefile 70  21  20  1
+OG0002050.fa.mafft.clipkit.treefile 80  21  17  4
+OG0002051.fa.mafft.clipkit.treefile 60  21  19  2
+OG0002051.fa.mafft.clipkit.treefile 70  21  18  3
+OG0002051.fa.mafft.clipkit.treefile 80  21  14  7
+OG0002053.fa.mafft.clipkit.treefile 60  21  20  1
+OG0002053.fa.mafft.clipkit.treefile 70  21  20  1
+OG0002053.fa.mafft.clipkit.treefile 80  21  19  2</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li><span style="color: blue;">Which tree had the most branches
+collapsed and under what collapsing threshold?</span> Solution</li>
+</ol>
+<pre class="bash"><code>OG0002051.fa.mafft.clipkit.treefile had 7 branches that were collapsed</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>Examine the tree in
+<code>OG0002051.fa.mafft.clipkit.treefile.70collapsed</code>. <span style="color: blue;">Are shallow or deep branches collapsed? Why are is
+your answer more likely to be collapsed?</span></li>
+</ol>
+<p>Hint</p>
+<pre class="bash"><code># This command allows you to quickly view a phylogenetic tree in the terminal by printing a tree in ASCII characters.
+pk_print_tree OG0002051.fa.mafft.clipkit.treefile.70collapsed -r
+
+# the -r argument removes branch length information making it easier to see which branches got collapsed</code></pre>
+<p>Solution</p>
+<pre class="bash"><code>Often, deeper branches in a phylogeny will have lower support values because more ancient divergences are more difficult to
+accurately infer. Thus, deeper, not shallower, branches are more likely to be collapsed.</code></pre>
+<p><br></p>
+</div>
 <div id="prepare-the-necessary-input-files-and-calculate-internode-certainty-and-related-measures" class="section level2">
-<h2>2. Prepare the necessary input files and calculate internode
+<h2>3. Prepare the necessary input files and calculate internode
 certainty and related measures</h2>
 <ul>
 <li>The necessary input files to calculate internode certainty using
@@ -571,7 +639,6 @@ tree’ in <code>RAxML_info.Asp_Pen_phylo.ic</code>. In
 <code>\|</code> specifies to search for the string ‘Tree certainty’ and
 ‘Relative tree’ thereby allowing you to search for multiple strings in
 one command.</p>
-<p><br></p>
 <ol start="5" style="list-style-type: decimal">
 <li><span style="color: blue;">What are the follows of the following
 metrics?</span></li>
@@ -583,9 +650,10 @@ metrics?</span></li>
 <li>Relative tree certainty all including all conflicting
 bipartitions.</li>
 </ul>
+<p><br></p>
 </div>
 <div id="identify-bipartitions-with-low-internode-certainty-values" class="section level2">
-<h2>3. Identify bipartitions with low internode certainty values</h2>
+<h2>4. Identify bipartitions with low internode certainty values</h2>
 <p>To examine internode certainty values among bipartitions in our
 putative species tree, we will first execute a script that replaces
 bootstrap values with internode support values and forgo examination of
@@ -623,7 +691,7 @@ below.</p></li>
 <pre class="bash"><code>The branch at the ancestor of M. ruber and P. camemberti has a low IC value.</code></pre>
 </div>
 <div id="determine-gene-support-frequency-and-concordance-factors-for-the-reference-and-alternative-topology-at-the-contentious-internode" class="section level2">
-<h2>4. Determine gene support frequency and concordance factors for the
+<h2>5. Determine gene support frequency and concordance factors for the
 reference and alternative topology at the contentious internode</h2>
 <ul>
 <li>To determine gene support frequency, we will use RAxML. Note, you
@@ -702,7 +770,7 @@ bipartition?</li>
 <pre class="bash"><code>0/36.2</code></pre>
 </div>
 <div id="calculate-gene-wise-and-site-wise-phylogenetic-signal" class="section level2">
-<h2>5. Calculate gene-wise and site-wise phylogenetic signal</h2>
+<h2>6. Calculate gene-wise and site-wise phylogenetic signal</h2>
 <p>To determine gene-wise and site-wise phylogenetic signal, we will
 follow protocol first described in <a href="https://www.nature.com/articles/s41559-017-0126">Shen et
 al. (2017), Nature Ecology and Evolution</a> and calculate gene-wise and
@@ -821,11 +889,11 @@ signal?</span></li>
 <pre class="r"><code>No</code></pre>
 </div>
 <div id="bonus" class="section level2">
-<h2>Bonus</h2>
+<h2>7. Bonus</h2>
 <ol style="list-style-type: decimal">
-<li>Using only starting data of gene trees, use internode certainty to
-determine which dataset has greater consistency of single-gene trees
-across four datasets…</li>
+<li>Using only starting data of gene trees, use internode certainty
+(and/or related measures) to rank the following datasets from most
+consistent among single-gene trees to least. The four datasets are:</li>
 </ol>
 <ul>
 <li>Eutheria, a lineage of mammals,</li>
@@ -833,8 +901,6 @@ across four datasets…</li>
 <li>filamentous fungi, and</li>
 <li>mammals</li>
 </ul>
-<p><strong>Rank datasets from those with the most to least internode
-certainty.</strong></p>
 <p><br></p>
 <p>Light hints for overall workflow</p>
 <pre class="bash"><code>1. You will have to infer a summary tree (aka, species tree estimate) first. How do you infer a species tree from a collection of single gene trees?
@@ -869,6 +935,7 @@ certainity similar or different between SC-OGs and SNAP-OGs?</li>
 <pre class="bash"><code>Gotcha again!!!!
 
 No solution will be provided here. Grab a TA, discuss with them and show them your results.</code></pre>
+<p><br> <br> <br> <br></p>
 </div>
 </div>
 
