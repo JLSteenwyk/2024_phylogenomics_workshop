@@ -348,7 +348,7 @@ Solution:
 6. Conduct the same analysis using the alternative topology as an input by executing the following command:
 
 ```{bash, eval=F}
-iqtree2 -t Asp_Pen_phylo.subset.alt.new --gcf 1287.trees -- scf 100 -p FILES_AA_fastas_subset/ --prefix gcf1297_scf100_alt
+iqtree2 -t Asp_Pen_phylo.subset.alt.new --gcf 1287.trees --scf 100 -p FILES_AA_fastas_subset/ --prefix gcf1297_scf100_alt
 ```
 
 7. Examine the contentious bipartition where *Penicilliopsis zonata* splits from *Aspergillus* and *Penicillium* in file
