@@ -324,10 +324,10 @@ iqtree2 -t Asp_Pen_phylo.subset.new --gcf 1287.trees --scf 100 -p FILES_AA_fasta
 where:
 
 * -t specifies the putative species tree,
-* --gcf represents the 1287.trees observed single gene trees,
-* --scf 100 represents that 100 quartets will be randomly for each internal branch for computing site concordance factors, 
+* \-\-gcf represents the 1287.trees observed single gene trees,
+* \-\-scf 100 represents that 100 quartets will be randomly for each internal branch for computing site concordance factors, 
 * -p specifies the directory that has the single gene fasta files, and
-* --prefix specifies the prefix of the output files.
+* \-\-prefix specifies the prefix of the output files.
 
 4. There are four resulting files:
 * a log file,
