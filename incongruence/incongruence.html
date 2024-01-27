@@ -512,6 +512,9 @@ the path to executables:</li>
 cd standard-RAxML
 make -f Makefile.gcc
 cd ..</code></pre>
+<ol start="8" style="list-style-type: decimal">
+<li>An additional cleaning step of the data is needed due to</li>
+</ol>
 <p><br></p>
 </div>
 <div id="how-to-collapse-branches-by-a-support-threshold" class="section level2">
@@ -628,20 +631,32 @@ work),</li>
 <li>-n specifies a string given to output, and</li>
 <li>-C will provide a verbose output.</li>
 </ul>
-<p>The verbose output provides the user with two additional file types:
-* (1) files with the reference and alternative topologies for each
+<p>The verbose output provides the user with two additional file
+types:</p>
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>files with the reference and alternative topologies for each
 bipartition, which is specified in the following syntax of
 <code>RAxML_verboseIC.Asp_Pen_phylo.ic.0</code> …
-<code>RAxML_verboseIC.Asp_Pen_phylo.ic.N-1</code> + where N is the
-number of bipartitions in a given tree * (2) a summary file,
-<code>RAxML_verboseSplits.Asp_Pen_phylo.ic</code>, of various
-topologies, gene support frequencies, and internode certainty values for
-each bipartition. * Other output files include + an information file,
-<code>RAxML_info.Asp_Pen_phylo.ic</code>, which contains details about
-the RAxML run, +
-<code>RAxML_IC_Score_BranchLabels.Asp_Pen_phylo.ic</code>, which
+<code>RAxML_verboseIC.Asp_Pen_phylo.ic.N-1</code></li>
+</ol>
+<ul>
+<li>where N is the number of bipartitions in a given tree</li>
+</ul></li>
+<li><ol start="2" style="list-style-type: decimal">
+<li>a summary file, <code>RAxML_verboseSplits.Asp_Pen_phylo.ic</code>,
+of various topologies, gene support frequencies, and internode certainty
+values for each bipartition.</li>
+</ol></li>
+<li>Other output files include
+<ul>
+<li>an information file, <code>RAxML_info.Asp_Pen_phylo.ic</code>, which
+contains details about the RAxML run,</li>
+<li><code>RAxML_IC_Score_BranchLabels.Asp_Pen_phylo.ic</code>, which
 contains the input tree with internode certainty and internode certainty
-all values on the tree represented as branch labels.</p>
+all values on the tree represented as branch labels.</li>
+</ul></li>
+</ul>
 <ol start="5" style="list-style-type: decimal">
 <li>Examine the contents of the information file,
 <code>RAxML_info.Asp_Pen_phylo.ic</code>. Determine the tree certainty
@@ -721,12 +736,15 @@ used the <code>pk_ptt</code> function.</li>
 <p>Steps: 1. Examine the verboseSplits output from RAxML, which is file
 <code>RAxML_verboseSplits.Asp_Pen_phylo.ic</code> 2. The bipartition for
 the contentious internode of question is second to last instance of the
-string ‘partition:’, which appears as the following: partition: —**
-***** * xx/yy/zz –<em>– </em>**** * xx/yy/zz –*** —– - xx/yy/zz</p>
-<p>where <code>xx/yy/zz</code> represents the following: * xx: the
-number of genes that support a given bipartition, * yy: the gene support
-frequency of the given bipartition, and • zz: the internode certainty
-value for the given internode.</p>
+string ‘partition:’, which appears as the following: partition:</p>
+<p>—** ***** * xx/yy/zz <br> –<em>– </em>**** * xx/yy/zz <br> –*** —– -
+xx/yy/zz <br></p>
+<p>where <code>xx/yy/zz</code> represents the following:</p>
+<ul>
+<li>xx: the number of genes that support a given bipartition,</li>
+<li>yy: the gene support frequency of the given bipartition, and • zz:
+the internode certainty value for the given internode.</li>
+</ul>
 <p>We will focus on the first two topologies which consider whether the
 genus <em>Penicilliopsis</em> is more closely related to outgroup taxa
 or if <em>Xeromyces</em> and <em>Monascus</em> is. In other words, which
@@ -811,7 +829,7 @@ iqtree2 -s concatenation.fasta -seed 13469781343 -st AA -pre likelihood_alt -spp
 <ol start="2" style="list-style-type: decimal">
 <li><span style="color: blue;">In the previous two commands, what do the
 following specify?</span> Hint, it will be useful to use their
-documentation – see [<a href="http://www.iqtree.org/doc/Command-Reference" class="uri">http://www.iqtree.org/doc/Command-Reference</a>.]</li>
+documentation – see <a href="http://www.iqtree.org/doc/Command-Reference">http://www.iqtree.org/doc/Command-Reference</a>.</li>
 </ol>
 <ul>
 <li>-spp</li>
@@ -847,8 +865,12 @@ command.</p>
 <li>Next, read in the data tables using the following command:</li>
 </ol>
 <pre class="r"><code>gene &lt;- read.table(&quot;gene-wise_logli_scores.txt&quot;, sep = &quot;\t&quot;)</code></pre>
-<p>where * read.table() is an R function to read in a table or text file
-and * sep = “ specifies that the table is tab (or”) delimited.</p>
+<p>where</p>
+<ul>
+<li>read.table() is an R function to read in a table or text file
+and</li>
+<li>sep = “ specifies that the table is tab (or”) delimited.</li>
+</ul>
 <ol start="6" style="list-style-type: decimal">
 <li>Make a plot of the gene-wise log likelihood scores using the
 following command:</li>
@@ -877,9 +899,13 @@ removing the gene-wise log likelihood score for this gene. To do so,
 execute the following command:</li>
 </ol>
 <pre class="r"><code>sum(gene[(gene$V4 != 113.18), ]$V4)</code></pre>
-<p>where * <code>sum()</code> will calculate the sum of a set of numbers
-and * <code>gene[(gene$V4!=113.180),]$V4</code> will print the set of
-numbers excluding the highly opinionated gene.</p>
+<p>where</p>
+<ul>
+<li><code>sum()</code> will calculate the sum of a set of numbers
+and</li>
+<li><code>gene[(gene$V4!=113.180),]$V4</code> will print the set of
+numbers excluding the highly opinionated gene.</li>
+</ul>
 <ol start="10" style="list-style-type: decimal">
 <li><span style="color: blue;">Does the topology change if you remove
 this gene?</span></li>

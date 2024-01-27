@@ -85,6 +85,8 @@ make -f Makefile.gcc
 cd ..
 ```
 
+8. An additional cleaning step of the data is needed due to 
+
 <br>
 
 ## 2. How to collapse branches by a support threshold
@@ -195,7 +197,8 @@ raxmlHPC -f i -t Asp_Pen_phylo.subset.new -z 1287.trees -m GTRCAT -n Asp_Pen_phy
 * -n specifies a string given to output, and
 * -C will provide a verbose output.
 
-The verbose output provides the user with two additional file types: 
+The verbose output provides the user with two additional file types:
+
 * (1) files with the reference and alternative topologies for each bipartition, which is specified in the following syntax of `RAxML_verboseIC.Asp_Pen_phylo.ic.0` ... `RAxML_verboseIC.Asp_Pen_phylo.ic.N-1`
   + where N is the number of bipartitions in a given tree 
 * (2) a summary file, `RAxML_verboseSplits.Asp_Pen_phylo.ic`, of various topologies, gene support frequencies, and internode certainty values for each bipartition.
@@ -265,6 +268,7 @@ The branch at the ancestor of M. ruber and P. camemberti has a low IC value.
 ```
 
 ## 5. Determine gene support frequency and concordance factors for the reference and alternative topology at the contentious internode
+
 * To determine gene support frequency, we will use RAxML. Note, you have previously calculate gene support frequencies with PhyKIT when you used the `pk_ptt` function.
 * To determine concordance factors, we will use IQ-Tree.
 
@@ -272,11 +276,13 @@ Steps:
 1. Examine the verboseSplits output from RAxML, which is file `RAxML_verboseSplits.Asp_Pen_phylo.ic`
 2. The bipartition for the contentious internode of question is second to last instance of the string ‘partition:’, which appears as the following:
   partition:
-  ---** ***** *      xx/yy/zz
-  --*-- ***** *      xx/yy/zz
-  --*** ----- -      xx/yy/zz
+
+  ---** ***** *      xx/yy/zz <br>
+  --*-- ***** *      xx/yy/zz <br>
+  --*** ----- -      xx/yy/zz <br>
 
 where `xx/yy/zz` represents the following:
+
 * xx: the number of genes that support a given bipartition,
 * yy: the gene support frequency of the given bipartition, and
 • zz: the internode certainty value for the given internode.
@@ -360,7 +366,8 @@ iqtree2 -s concatenation.fasta -seed 13469781343 -st AA -pre likelihood_alt -spp
 ```
 
 2. `r colorize("In the previous two commands, what do the following specify?", "blue")`
-Hint, it will be useful to use their documentation – see [http://www.iqtree.org/doc/Command-Reference.]
+Hint, it will be useful to use their documentation – see [http://www.iqtree.org/doc/Command-Reference](http://www.iqtree.org/doc/Command-Reference).
+
 * -spp
 * -te
 * -wpl
@@ -400,6 +407,7 @@ appropriate directory. Make sure you are in the appropriate directory with the `
 gene<-read.table("gene-wise_logli_scores.txt", sep = "\t")
 ```
 where
+
 * read.table() is an R function to read in a table or text file and
 * sep = "\t" specifies that the table is tab (or "\t") delimited.
 
@@ -433,7 +441,8 @@ To do so, execute the following command:
 ```{r, eval=F}
 sum(gene[(gene$V4!= 113.180),]$V4)
 ```
-where 
+where
+
 * `sum()` will calculate the sum of a set of numbers and
 * `gene[(gene$V4!=113.180),]$V4` will print the set of numbers excluding the highly opinionated gene.
 
