@@ -404,8 +404,8 @@ bash ../FILES_scripts_and_matrices/create_GLS_summary.sh ../FILES_scripts_and_ma
 ```
 
 4. We will now examine the contents of gene-wise_logli_scores.txt and site-wise_logli_scores.txt.
-To do so, we will plot the results from each file in R using ggplot2. First, start a session in R by
-typing R in the terminal and load ggplot2 using the following command:
+To do so, we will plot the results from each file in RStudio using ggplot2. First, establish an RStudio
+server connection in a new window and load ggplot2 using the following command:
 
 ```{r, eval=F}
 library(ggplot2)
@@ -482,6 +482,9 @@ ggplot(site, aes(V1, V4, color=V5)) + geom_bar(stat="identity") +
   scale_color_manual(values=c("#56B4E9", "#999999", "#E69F00"))
 ```
 
+Note, this plot may take 5-10 minutes to generate. If you don't want to wait, see `FILES_results/FILES_gene-wise_site-wise_log_likelihood/site_wise.png` for a 
+premade PNG file of the same plot that would be generated.
+
 12. `r colorize("Is there one site with overwhelming signal?", "blue")`
 
 Solution
@@ -496,6 +499,8 @@ The four datasets are:
 * budding yeasts,
 * filamentous fungi, and
 * mammals
+
+Each dataset has both SC-OGs and SNAP-OGs. For this bonus question, use both SC-OGs and SNAP-OGs.
 
 <br>
 
