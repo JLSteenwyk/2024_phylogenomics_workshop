@@ -85,8 +85,6 @@ make -f Makefile.gcc
 cd ..
 ```
 
-8. An additional cleaning step of the data is needed due to 
-
 <br>
 
 ## 2. How to collapse branches by a support threshold
