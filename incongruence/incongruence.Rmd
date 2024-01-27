@@ -119,9 +119,10 @@ Hint
 Solution
 ```{bash, eval=F}
 # copy and paste this one-liner
-for i in *treefile ; do cnt=$(pk_internal_branch_stats $i -v | wc -l) ; for j in $(echo "60 70 80"); do coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) ; num_coll=$(expr $cnt - $coll_cnt) ; echo -e "$i\t$j\t$cnt\t$coll_cnt\t$num_coll" ; done ; done
+echo -e "file\tthreshold\tBranch cnt-uncoll\tBranch cnt-coll\tNum. collapsed branches" ; for i in *treefile ; do cnt=$(pk_internal_branch_stats $i -v | wc -l) ; for j in $(echo "60 70 80"); do coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) ; num_coll=$(expr $cnt - $coll_cnt) ; echo -e "$i\t$j\t$cnt\t$coll_cnt\t$num_coll" ; done ; done
 
 # one-liner written out as more readable with comments so you can better understand
+echo -e "file\tthreshold\tBranch cnt-uncoll\tBranch cnt-coll\tNum. collapsed branches" ; 
 for i in *treefile ; do
   cnt=$(pk_internal_branch_stats $i -v | wc -l) # count internal branches in the uncollapsed case
   for j in $(echo "60 70 80"); do
@@ -131,6 +132,7 @@ for i in *treefile ; do
   done ;
 done
 
+file	threshold	Branch cnt-uncoll	Branch cnt-coll	Num. collapsed branches
 OG0002050.fa.mafft.clipkit.treefile	60	21	20	1
 OG0002050.fa.mafft.clipkit.treefile	70	21	20	1
 OG0002050.fa.mafft.clipkit.treefile	80	21	17	4
@@ -141,6 +143,14 @@ OG0002053.fa.mafft.clipkit.treefile	60	21	20	1
 OG0002053.fa.mafft.clipkit.treefile	70	21	20	1
 OG0002053.fa.mafft.clipkit.treefile	80	21	19	2
 ```
+
+where
+
+* column 1: Tree being examined
+* column 2: Collapsing threshold
+* column 3: Number of internal branches in uncollapsed tree
+* column 4: Number of internal branches in collapsed tree
+* column 5: The number of collapsed branches
 
 4. `r colorize("Which tree had the most branches collapsed and under what collapsing threshold?", "blue")`
 Solution

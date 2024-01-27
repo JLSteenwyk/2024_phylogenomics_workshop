@@ -547,9 +547,10 @@ loop. Make the output be nicely.</li>
 # Thereafter, we can count how many internal branches there are and calculate the difference to see how many were collapsed.</code></pre>
 <p>Solution</p>
 <pre class="bash"><code># copy and paste this one-liner
-for i in *treefile ; do cnt=$(pk_internal_branch_stats $i -v | wc -l) ; for j in $(echo &quot;60 70 80&quot;); do coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) ; num_coll=$(expr $cnt - $coll_cnt) ; echo -e &quot;$i\t$j\t$cnt\t$coll_cnt\t$num_coll&quot; ; done ; done
+echo -e &quot;file\tthreshold\tBranch cnt-uncoll\tBranch cnt-coll\tNum. collapsed branches&quot; ; for i in *treefile ; do cnt=$(pk_internal_branch_stats $i -v | wc -l) ; for j in $(echo &quot;60 70 80&quot;); do coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) ; num_coll=$(expr $cnt - $coll_cnt) ; echo -e &quot;$i\t$j\t$cnt\t$coll_cnt\t$num_coll&quot; ; done ; done
 
 # one-liner written out as more readable with comments so you can better understand
+echo -e &quot;file\tthreshold\tBranch cnt-uncoll\tBranch cnt-coll\tNum. collapsed branches&quot; ; 
 for i in *treefile ; do
   cnt=$(pk_internal_branch_stats $i -v | wc -l) # count internal branches in the uncollapsed case
   for j in $(echo &quot;60 70 80&quot;); do
@@ -559,6 +560,7 @@ for i in *treefile ; do
   done ;
 done
 
+file    threshold   Branch cnt-uncoll   Branch cnt-coll Num. collapsed branches
 OG0002050.fa.mafft.clipkit.treefile 60  21  20  1
 OG0002050.fa.mafft.clipkit.treefile 70  21  20  1
 OG0002050.fa.mafft.clipkit.treefile 80  21  17  4
@@ -568,6 +570,14 @@ OG0002051.fa.mafft.clipkit.treefile 80  21  14  7
 OG0002053.fa.mafft.clipkit.treefile 60  21  20  1
 OG0002053.fa.mafft.clipkit.treefile 70  21  20  1
 OG0002053.fa.mafft.clipkit.treefile 80  21  19  2</code></pre>
+<p>where</p>
+<ul>
+<li>column 1: Tree being examined</li>
+<li>column 2: Collapsing threshold</li>
+<li>column 3: Number of internal branches in uncollapsed tree</li>
+<li>column 4: Number of internal branches in collapsed tree</li>
+<li>column 5: The number of collapsed branches</li>
+</ul>
 <ol start="4" style="list-style-type: decimal">
 <li><span style="color: blue;">Which tree had the most branches
 collapsed and under what collapsing threshold?</span> Solution</li>
