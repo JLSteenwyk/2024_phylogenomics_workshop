@@ -493,7 +493,7 @@ No
 ```
 
 ## 7. Bonus
-1. Using only starting data of gene trees, use internode certainty (and/or related measures) to rank the following datasets from most consistent among single-gene trees to least.
+1. Using only starting data of gene trees, use internode certainty (and/or related measures) to rank the following datasets (which are found in FILES_bonus_datasets) from most consistent among single-gene trees to least.
 The four datasets are: 
 * Eutheria, a lineage of mammals,
 * budding yeasts,
