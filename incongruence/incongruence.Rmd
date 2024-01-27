@@ -53,7 +53,7 @@ As noted above, the dataset for this practical comes from [Steenwyk et al. (2019
 ## 1. Download and examine the dataset 
 
 1.  With your Guacamole terminal download the data set, which is available here:
-[https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/incongruence/confidence_measures.tar.gz](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/incongruence/confidence_measures.tar.gz).
+[https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/incongruence/confidence_measures.tar.gz](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/incongruence/confidence_measures.tar.gz)
 
 Hint:
 ```{bash, eval=F}
