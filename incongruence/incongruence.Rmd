@@ -236,7 +236,9 @@ where grep searches for the string ‘Tree certainty’ and ‘Relative tree’ 
 To examine internode certainty values among bipartitions in our putative species tree,
 we will first execute a script that replaces bootstrap values with internode support values
 and forgo examination of internode certainty all values. We will then view the tree in
-FigTree or similar software.
+FigTree or similar software. Note, if you'd like to use a webservice like [phylo.io](https://phylo.io/),
+you can `cat` the tree file and copy and paste the resulting text into the `Tree data` box on the [phylo.io](https://phylo.io/)
+website.
 
 Steps:
 
