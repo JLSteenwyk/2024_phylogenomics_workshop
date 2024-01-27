@@ -263,7 +263,7 @@ lower have ~5 evaluation trees that support the reference topology and ~2 or mor
 topology - we consider this substantial incongruence.
 
 5. Identify the internode with an internode certainty below 0.1 and specify the value and which internode that is in the
-phylogeny below.
+phylogeny below. Note, you will have midpoint root the phylogeny first, or place the root at ancestor of *U. reesii* and *C. posadasii*.
 
 ```{r, echo=FALSE}
 
