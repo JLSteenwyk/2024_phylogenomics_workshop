@@ -516,7 +516,7 @@ Light hints for overall workflow
 Detailed hints for overall workflow
 ```{bash, eval=F}
 1. To do so, first infer a summary tree using ASTRAL and then use the input trees as evaluation trees to calculate internode certainty and related measures in RAxML.
-java -jar astral.jar -i all_trees.tre -o output_tree
+astral.jar -i all_trees.tre -o output_tree
 
 2. Calculate internode certainty
 raxmlHPC -f i -t output_tree -z all_trees.tre -m GTRCAT -n output_tree.ic -C
