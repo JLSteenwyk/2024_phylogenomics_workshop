@@ -281,7 +281,9 @@ The branch at the ancestor of M. ruber and P. camemberti has a low IC value.
 * To determine concordance factors, we will use IQ-Tree.
 
 Steps:
+
 1. Examine the verboseSplits output from RAxML, which is file `RAxML_verboseSplits.Asp_Pen_phylo.ic`
+
 2. The bipartition for the contentious internode of question is second to last instance of the string ‘partition:’, which appears as the following:
   partition:
 
@@ -333,7 +335,7 @@ where:
 
 For now, we will focus on gene and site concordance factors.
 
-4. Reexamine the contentious bipartition in the `gcf1297_scf100_ref.cf.tree` file, which can be viewed in FigTree or similar software.
+5. Reexamine the contentious bipartition in the `gcf1297_scf100_ref.cf.tree` file, which can be viewed in FigTree or similar software.
 `r colorize("What is the gene concordance and site concordance factor for the contentious bipartition?", "blue")`
 
 Solution:
@@ -341,13 +343,13 @@ Solution:
 0.155/32.1
 ```
 
-5. Conduct the same analysis using the alternative topology as an input by executing the following command:
+6. Conduct the same analysis using the alternative topology as an input by executing the following command:
 
 ```{bash, eval=F}
 iqtree -t Asp_Pen_phylo.subset.alt.new --gcf 1287.trees -- scf 100 -p FILES_AA_fastas_subset/ --prefix gcf1297_scf100_alt
 ```
 
-6. Examine the contentious bipartition where *Penicilliopsis zonata* splits from *Aspergillus* and *Penicillium* in file
+7. Examine the contentious bipartition where *Penicilliopsis zonata* splits from *Aspergillus* and *Penicillium* in file
 `gcf1297_scf100_alt.cf.tree`. What is the gene concordance factor and site concordance factor for this bipartition?
 
 Solution:
