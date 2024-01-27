@@ -496,7 +496,7 @@ available here: <a href="https://github.com/JLSteenwyk/2024_phylogenomics_worksh
 </ol>
 <p>Hint:</p>
 <pre class="bash"><code># the command is &#39;tar&#39; (&quot;tape archive&quot;)</code></pre>
-<p>solution:</p>
+<p>Solution:</p>
 <pre class="bash"><code>$ tar -zxvf confidence_measures.tar.gz</code></pre>
 <ol start="4" style="list-style-type: decimal">
 <li>Change directory into the newly unzipped directory</li>
@@ -504,7 +504,14 @@ available here: <a href="https://github.com/JLSteenwyk/2024_phylogenomics_worksh
 command</li>
 <li><span style="color: blue;">How many files are in
 confidence_measures?</span></li>
+<li><span style="color: blue;">Is standard RAxML installed (i.e., not
+RAxML-NG)?</span> If not, execute the following code and keep in mind
+the path to executables:</li>
 </ol>
+<pre class="bash"><code>git clone https://github.com/stamatak/standard-RAxML.git
+cd standard-RAxML
+make -f Makefile.gcc
+cd ..</code></pre>
 <p><br></p>
 </div>
 <div id="how-to-collapse-branches-by-a-support-threshold" class="section level2">
@@ -525,8 +532,9 @@ function.</p>
 <ol start="3" style="list-style-type: decimal">
 <li>Count the number of internal branches in each file and each
 threshold (including no collapsing) using a nested <code>for</code>
-loop. Make the output be nicely. Hint</li>
+loop. Make the output be nicely.</li>
 </ol>
+<p>Hint</p>
 <pre class="bash"><code># The first question is how do we count internal branches in a phylogenetic tree? 
 # I know an indirect way we can do this using the `internal_branch_stats` function of PhyKIT.
 
@@ -535,10 +543,14 @@ loop. Make the output be nicely. Hint</li>
 # using the `internal_branch_stats` function but use the verbose option (-v/--verbose) and get the length of each internal branch.
 # Thereafter, we can count how many internal branches there are and calculate the difference to see how many were collapsed.</code></pre>
 <p>Solution</p>
-<pre class="bash"><code>for i in *treefile ; do
+<pre class="bash"><code># copy and paste this one-liner
+for i in *treefile ; do cnt=$(pk_internal_branch_stats $i -v | wc -l) ; for j in $(echo &quot;60 70 80&quot;); do coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) ; num_coll=$(expr $cnt - $coll_cnt) ; echo -e &quot;$i\t$j\t$cnt\t$coll_cnt\t$num_coll&quot; ; done ; done
+
+# one-liner written out as more readable with comments so you can better understand
+for i in *treefile ; do
   cnt=$(pk_internal_branch_stats $i -v | wc -l) # count internal branches in the uncollapsed case
   for j in $(echo &quot;60 70 80&quot;); do
-    coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) $ count internal branches in the collapsed case
+    coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) # count internal branches in the collapsed case
     num_coll=$(expr $cnt - $coll_cnt) # substract the collapsed number of internal branches from the uncollapsed number of internal branches 
     echo -e &quot;$i\t$j\t$cnt\t$coll_cnt\t$num_coll&quot;
   done ;
@@ -560,8 +572,8 @@ collapsed and under what collapsing threshold?</span> Solution</li>
 <pre class="bash"><code>OG0002051.fa.mafft.clipkit.treefile had 7 branches that were collapsed</code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li>Examine the tree in
-<code>OG0002051.fa.mafft.clipkit.treefile.70collapsed</code>. <span style="color: blue;">Are shallow or deep branches collapsed? Why are is
-your answer more likely to be collapsed?</span></li>
+<code>OG0002051.fa.mafft.clipkit.treefile.70collapsed</code>. <span style="color: blue;">Are shallow or deep branches collapsed? Why is your
+answer more likely to be collapsed?</span></li>
 </ol>
 <p>Hint</p>
 <pre class="bash"><code># This command allows you to quickly view a phylogenetic tree in the terminal by printing a tree in ASCII characters.
@@ -569,8 +581,7 @@ pk_print_tree OG0002051.fa.mafft.clipkit.treefile.70collapsed -r
 
 # the -r argument removes branch length information making it easier to see which branches got collapsed</code></pre>
 <p>Solution</p>
-<pre class="bash"><code>Often, deeper branches in a phylogeny will have lower support values because more ancient divergences are more difficult to
-accurately infer. Thus, deeper, not shallower, branches are more likely to be collapsed.</code></pre>
+<pre class="bash"><code>Often, deeper branches in a phylogeny will have lower support values because more ancient divergences are more difficult to accurately infer. Thus, deeper, not shallower, branches are more likely to be collapsed.</code></pre>
 <p><br></p>
 </div>
 <div id="prepare-the-necessary-input-files-and-calculate-internode-certainty-and-related-measures" class="section level2">
@@ -591,16 +602,20 @@ are a subset from the original 1,668 data matrix.</li>
 </ul>
 <p>Steps:</p>
 <ol style="list-style-type: decimal">
+<li>Go to your parent directory using the <code>cd</code> command:
+<code>cd ..</code></li>
 <li><span style="color: blue;">How many single gene trees are in
 FILES_AA_trees_subset?</span></li>
 <li>Create a file of evaluation trees with the following command:</li>
 </ol>
 <pre class="bash"><code>cat FILES_AA_trees_subset/* &gt; 1287.trees</code></pre>
-<ol start="3" style="list-style-type: decimal">
+<ol start="4" style="list-style-type: decimal">
 <li>Calculate values of internode certainty and related measures using
 the following command:</li>
 </ol>
-<pre class="bash"><code>raxmlHPC -f i -t Asp_Pen_phylo.subset.new -z 1287.trees -m GTRCAT -n Asp_Pen_phylo.ic -C</code></pre>
+<pre class="bash"><code># Note, you may have to provide the full path to raxmlHPC
+# The full path may be ./standard-RAxML/raxmlHPC, if you made a local installation in step 1.7.
+raxmlHPC -f i -t Asp_Pen_phylo.subset.new -z 1287.trees -m GTRCAT -n Asp_Pen_phylo.ic -C</code></pre>
 <ul>
 <li>-f i specifies that calculations of internode certainty, internode
 certainty all, tree certainty, and tree certainty all will be displayed
@@ -627,7 +642,7 @@ the RAxML run, +
 <code>RAxML_IC_Score_BranchLabels.Asp_Pen_phylo.ic</code>, which
 contains the input tree with internode certainty and internode certainty
 all values on the tree represented as branch labels.</p>
-<ol start="4" style="list-style-type: decimal">
+<ol start="5" style="list-style-type: decimal">
 <li>Examine the contents of the information file,
 <code>RAxML_info.Asp_Pen_phylo.ic</code>. Determine the tree certainty
 and relative tree certainty value using the following commands:</li>
@@ -639,7 +654,7 @@ tree’ in <code>RAxML_info.Asp_Pen_phylo.ic</code>. In
 <code>\|</code> specifies to search for the string ‘Tree certainty’ and
 ‘Relative tree’ thereby allowing you to search for multiple strings in
 one command.</p>
-<ol start="5" style="list-style-type: decimal">
+<ol start="6" style="list-style-type: decimal">
 <li><span style="color: blue;">What are the follows of the following
 metrics?</span></li>
 </ol>
@@ -668,10 +683,14 @@ To understand how to use the script, execute the following command:</li>
 </ol>
 <pre class="bash"><code>python FILES_scripts_and_matrices/report_ic_as_internode_support.py -h</code></pre>
 <ol start="2" style="list-style-type: decimal">
-<li><p>Based on the help message printed from the previous command,
-execute the script on the following tree
+<li>Based on the help message printed from the previous command, execute
+the script on the following tree
 <code>RAxML_IC_Score_BranchLabels.Asp_Pen_phylo.ic</code> to report
-internode certainty values as support values.</p></li>
+internode certainty values as support values.</li>
+</ol>
+<p>Solution</p>
+<pre class="bash"><code>python FILES_scripts_and_matrices/report_ic_as_internode_support.py -t RAxML_IC_Score_BranchLabels.Asp_Pen_phylo.ic</code></pre>
+<ol start="3" style="list-style-type: decimal">
 <li><p>Open up the resulting file,
 <code>RAxML_IC_Score_BranchLabels.Asp_Pen_phylo.ic.ic.tree</code>, using
 FigTree or your preferred tree viewer.</p></li>

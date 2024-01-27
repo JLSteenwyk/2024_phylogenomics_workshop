@@ -68,7 +68,7 @@ Hint:
 # the command is 'tar' ("tape archive")
 ```
 
-solution:
+Solution:
 ```{bash, eval=F}
 $ tar -zxvf confidence_measures.tar.gz
 ```
@@ -76,6 +76,14 @@ $ tar -zxvf confidence_measures.tar.gz
 4. Change directory into the newly unzipped directory
 5. Examine the contents of the directory using the `ls` command
 6. `r colorize("How many files are in confidence_measures?", "blue")`
+7. `r colorize("Is standard RAxML installed (i.e., not RAxML-NG)?", "blue")` If not, execute the following code and keep in mind the path to executables:
+
+```{bash, eval=F}
+git clone https://github.com/stamatak/standard-RAxML.git
+cd standard-RAxML
+make -f Makefile.gcc
+cd ..
+```
 
 <br>
 
@@ -94,6 +102,7 @@ for j in $(echo "60 70 80"); do for i in $(ls *treefile) ; do echo $i $j ; pk_co
 ```
 
 3. Count the number of internal branches in each file and each threshold (including no collapsing) using a nested `for` loop. Make the output be nicely. 
+
 Hint
 ```{bash, eval=F}
 # The first question is how do we count internal branches in a phylogenetic tree? 
@@ -107,10 +116,14 @@ Hint
 
 Solution
 ```{bash, eval=F}
+# copy and paste this one-liner
+for i in *treefile ; do cnt=$(pk_internal_branch_stats $i -v | wc -l) ; for j in $(echo "60 70 80"); do coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) ; num_coll=$(expr $cnt - $coll_cnt) ; echo -e "$i\t$j\t$cnt\t$coll_cnt\t$num_coll" ; done ; done
+
+# one-liner written out as more readable with comments so you can better understand
 for i in *treefile ; do
   cnt=$(pk_internal_branch_stats $i -v | wc -l) # count internal branches in the uncollapsed case
   for j in $(echo "60 70 80"); do
-    coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) $ count internal branches in the collapsed case
+    coll_cnt=$(pk_internal_branch_stats $i.${j}collapsed -v | wc -l) # count internal branches in the collapsed case
     num_coll=$(expr $cnt - $coll_cnt) # substract the collapsed number of internal branches from the uncollapsed number of internal branches 
     echo -e "$i\t$j\t$cnt\t$coll_cnt\t$num_coll"
   done ;
@@ -134,7 +147,7 @@ OG0002051.fa.mafft.clipkit.treefile had 7 branches that were collapsed
 ```
 
 5. Examine the tree in `OG0002051.fa.mafft.clipkit.treefile.70collapsed`. 
-`r colorize("Are shallow or deep branches collapsed? Why are is your answer more likely to be collapsed?", "blue")`
+`r colorize("Are shallow or deep branches collapsed? Why is your answer more likely to be collapsed?", "blue")`
 
 Hint
 ```{bash, eval=F}
@@ -146,8 +159,7 @@ pk_print_tree OG0002051.fa.mafft.clipkit.treefile.70collapsed -r
 
 Solution
 ```{bash, eval=F}
-Often, deeper branches in a phylogeny will have lower support values because more ancient divergences are more difficult to
-accurately infer. Thus, deeper, not shallower, branches are more likely to be collapsed.
+Often, deeper branches in a phylogeny will have lower support values because more ancient divergences are more difficult to accurately infer. Thus, deeper, not shallower, branches are more likely to be collapsed.
 ```
 
 <br>
@@ -160,16 +172,19 @@ accurately infer. Thus, deeper, not shallower, branches are more likely to be co
  
 Steps:
 
-1. `r colorize("How many single gene trees are in FILES_AA_trees_subset?", "blue")` 
-2. Create a file of evaluation trees with the following command:
+1. Go to your parent directory using the `cd` command: `cd ..`
+2. `r colorize("How many single gene trees are in FILES_AA_trees_subset?", "blue")` 
+3. Create a file of evaluation trees with the following command:
 
 ```{bash, eval=F}
 cat FILES_AA_trees_subset/* > 1287.trees
 ```
 
-3. Calculate values of internode certainty and related measures using the following command:
+4. Calculate values of internode certainty and related measures using the following command:
 
 ```{bash, eval=F}
+# Note, you may have to provide the full path to raxmlHPC
+# The full path may be ./standard-RAxML/raxmlHPC, if you made a local installation in step 1.7.
 raxmlHPC -f i -t Asp_Pen_phylo.subset.new -z 1287.trees -m GTRCAT -n Asp_Pen_phylo.ic -C
 ```
 
@@ -188,7 +203,7 @@ The verbose output provides the user with two additional file types:
   + an information file, `RAxML_info.Asp_Pen_phylo.ic`, which contains details about the RAxML run, 
   + `RAxML_IC_Score_BranchLabels.Asp_Pen_phylo.ic`, which contains the input tree with internode certainty and internode certainty all values on the tree represented as branch labels.
 
-4. Examine the contents of the information file, `RAxML_info.Asp_Pen_phylo.ic`. Determine the tree certainty and relative tree certainty value using the following commands:
+5. Examine the contents of the information file, `RAxML_info.Asp_Pen_phylo.ic`. Determine the tree certainty and relative tree certainty value using the following commands:
 
 ```{bash, eval=F}
 grep "Tree certainty\|Relative tree" RAxML_info.Asp_Pen_phylo.ic
@@ -197,7 +212,7 @@ grep "Tree certainty\|Relative tree" RAxML_info.Asp_Pen_phylo.ic
 where grep searches for the string ‘Tree certainty’ and ‘Relative tree’ in `RAxML_info.Asp_Pen_phylo.ic`. In `Tree certainty\|Relative tree` of the grep command, the `\|` specifies to search for the string ‘Tree certainty’ and ‘Relative tree’ thereby allowing you to search for multiple strings in one command.
 
 
-5. `r colorize("What are the follows of the following metrics?", "blue")`
+6. `r colorize("What are the follows of the following metrics?", "blue")`
 * Tree certainty value.
 * Relative tree certainty.
 * Tree certainty all including all conflicting bipartitions.
@@ -223,6 +238,11 @@ python FILES_scripts_and_matrices/report_ic_as_internode_support.py -h
 
 2. Based on the help message printed from the previous command, execute the script on the following tree
 `RAxML_IC_Score_BranchLabels.Asp_Pen_phylo.ic` to report internode certainty values as support values.
+
+Solution
+```{bash, eval=F}
+python FILES_scripts_and_matrices/report_ic_as_internode_support.py -t RAxML_IC_Score_BranchLabels.Asp_Pen_phylo.ic
+```
 
 3. Open up the resulting file, `RAxML_IC_Score_BranchLabels.Asp_Pen_phylo.ic.ic.tree`, using FigTree or your preferred tree viewer.
 
