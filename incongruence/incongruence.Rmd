@@ -318,6 +318,7 @@ Second topology:
 iqtree2 -t Asp_Pen_phylo.subset.new --gcf 1287.trees --scf 100 -p FILES_AA_fastas_subset/ --prefix gcf1297_scf100_ref
 ```
 where:
+
 * -t specifies the putative species tree,
 * --gcf represents the 1287.trees observed single gene trees,
 * --scf 100 represents that 100 quartets will be randomly for each internal branch for computing site concordance factors, 
