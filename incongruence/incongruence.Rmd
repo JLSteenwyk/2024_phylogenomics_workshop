@@ -287,9 +287,9 @@ Steps:
 2. The bipartition for the contentious internode of question is second to last instance of the string ‘partition:’, which appears as the following:
   partition:
 
-  ---** ***** *      xx/yy/zz <br>
-  --*-- ***** *      xx/yy/zz <br>
-  --*** ----- -      xx/yy/zz <br>
+  \-\-\-** ***** *      xx/yy/zz <br>
+  \-\-*-\- ***** *      xx/yy/zz <br>
+  \-\-*** \-\-\-\-\- -      xx/yy/zz <br>
 
 where `xx/yy/zz` represents the following:
 
