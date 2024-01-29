@@ -76,14 +76,6 @@ $ tar -zxvf confidence_measures.tar.gz
 4. Change directory into the newly unzipped directory
 5. Examine the contents of the directory using the `ls` command
 6. `r colorize("How many files are in confidence_measures?", "blue")`
-7. `r colorize("Is standard RAxML installed (i.e., not RAxML-NG)?", "blue")` If not, execute the following code and keep in mind the path to executables:
-
-```{bash, eval=F}
-git clone https://github.com/stamatak/standard-RAxML.git
-cd standard-RAxML
-make -f Makefile.gcc
-cd ..
-```
 
 <br>
 
@@ -193,8 +185,8 @@ cat FILES_AA_trees_subset/* > 1287.trees
 4. Calculate values of internode certainty and related measures using the following command:
 
 ```{bash, eval=F}
-# Note, you may have to provide the full path to raxmlHPC
-# The full path may be ./standard-RAxML/raxmlHPC, if you made a local installation in step 1.7.
+# Note, internode certainty calculations have not yet been implemented in RAxML
+# As a result, we will use standard RAxML, which is called using raxmlHPC in your terminal
 raxmlHPC -f i -t Asp_Pen_phylo.subset.new -z 1287.trees -m GTRCAT -n Asp_Pen_phylo.ic -C
 ```
 
