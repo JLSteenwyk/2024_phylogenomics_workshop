@@ -57,6 +57,8 @@
 
 ### Confidence measures
 
+* [Presentation](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/blob/main/internode_certainty_and_related.pdf)
+
 * [Worksheet](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/blob/main/incongruence/incongruence.html)
 
 * [Data](https://github.com/JLSteenwyk/2024_phylogenomics_workshop/raw/main/incongruence/confidence_measures.tar.gz)
